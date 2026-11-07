@@ -1,0 +1,16 @@
+{
+  "name": "Sub Day Planner",
+  "short_name": "Sub Planner",
+  "description": "Sub plans, lessons and worksheets from your timetable and the Alberta K-6 curriculum.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F7F4EF",
+  "theme_color": "#2A66CC",
+  "orientation": "any",
+  "icons": [
+    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png"},
+    {"src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}
