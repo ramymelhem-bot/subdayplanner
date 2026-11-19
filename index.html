@@ -645,7 +645,7 @@ details.exmore{display:block} details.exmore>summary{cursor:pointer;padding:8px 
 .pd-glance{width:100%;border-collapse:collapse;margin-top:6px;font-size:13.5px}
 .pd-glance td,.pd-glance th{border:1px solid #c9c2b0;padding:3px 8px;text-align:left}
 .pd-glance th{background:#f3ead0}
-@media print{ .toast{display:none!important} }
+@media print{ .toast{display:none!important} body,#tab-gen,.wrap{padding-bottom:0!important} .pd-c.pd-thanks,.pd-c.pd-fb{break-inside:avoid!important} }
 .pd-wsnote{background:#fff7d6;border:1px dashed #c9a227;border-radius:6px;padding:6px 10px}
 .clipbar{position:fixed;left:50%;transform:translateX(-50%);top:calc(10px + env(safe-area-inset-top,0px));z-index:60;display:flex;gap:10px;align-items:center;background:var(--fg);color:var(--bg);padding:10px 12px 10px 16px;border-radius:18px;box-shadow:0 8px 24px rgba(0,0,0,.25);width:min(560px,calc(100vw - 24px));justify-content:space-between;font-size:14.5px}
 .clipbar .small{opacity:.8}
@@ -786,10 +786,10 @@ body.pasting :is(.drow,.wk-b,.tt-c>button).t-class,body.pasting :is(.drow,.wk-b,
       <div id="s-grid"></div>
       <details class="sect"><summary>See one day as a list</summary><div class="inner" style="display:flex;flex-direction:column;gap:8px">
         <div class="daypick" id="s-days" role="group" aria-label="Day of week"></div>
-        <div id="s-blocks" class="slist"></div></div></details>
+        <div id="s-blocks" class="slist"></div>
+        <div><button class="btn ghost" id="s-copy">Copy this day to every day</button></div></div></details>
       <div class="row">
         <button class="btn" id="s-add">+ Add a block</button>
-        <button class="btn ghost" id="s-copy">Copy this day to every day</button>
       </div>
     </div>
 
@@ -838,7 +838,7 @@ body.pasting :is(.drow,.wk-b,.tt-c>button).t-class,body.pasting :is(.drow,.wk-b,
       <summary class="card-h"><div class="lead"><h2><span class="stepno">D</span>My lessons</h2><p class="muted small" data-sumtext="d">Lessons you saved to reuse</p></div><span class="chev">▾</span></summary>
       <div id="lib-list"></div>
     </details>
-    <details class="card fold" id="fold-d">
+    <details class="card fold" id="fold-d" hidden>
       <summary class="card-h"><div class="lead"><h2><span class="stepno">E</span>Subject colours</h2><p class="muted small">Pick a colour for each subject. Also in ⚙️ Settings at the top.</p></div><span class="chev">▾</span></summary>
       <div id="colorlist" class="colorlist"></div>
       <div class="row" style="gap:8px;flex-wrap:wrap;margin-top:6px"><span class="small muted" style="align-self:center">Quick sets:</span><button class="chipbtn" data-pal="default">Classic</button><button class="chipbtn" data-pal="soft">Soft pastel</button><button class="chipbtn" data-pal="bold">Bold</button><button class="chipbtn" data-pal="earth">Earthy</button></div>
@@ -854,9 +854,9 @@ body.pasting :is(.drow,.wk-b,.tt-c>button).t-class,body.pasting :is(.drow,.wk-b,
       <div class="card-h"><div class="lead"><h2>This week's lessons</h2><p class="muted small">Tap a lesson to plan it. Changes here are for this week only.</p></div>
         <div class="weeknav"><button class="btn ghost" id="wk-prev" aria-label="Previous week">◀</button><b id="wk-label"></b><button class="btn ghost" id="wk-next" aria-label="Next week">▶</button></div></div>
       <div class="row" style="align-items:center;gap:8px"><div class="seg" id="wk-view" role="group" aria-label="Show lessons as"><button data-v="table">Grid</button><button data-v="day">List</button></div><button class="btn ghost" id="wk-orig" hidden>See my original</button></div>
+      <div id="wk-today"></div>
       <div id="wk-recap"></div>
       <div id="wk-report"></div>
-      <div id="wk-today"></div>
       <div id="wk-last"></div>
       <div id="wk-grid"></div>
       <p class="small muted swipehint">Swipe sideways to see the whole week.</p>
@@ -864,6 +864,7 @@ body.pasting :is(.drow,.wk-b,.tt-c>button).t-class,body.pasting :is(.drow,.wk-b,
         <button class="btn" id="wk-add">+ Add a block</button>
         <button class="btn" id="wk-unit">Plan a topic over days</button>
         <button class="btn" id="d-emergency">⚡ Fill every empty block</button>
+        <button class="btn" id="d-report" hidden>📝 How did this day go?</button>
         <details class="moremenu"><summary class="btn">More ▾</summary><div class="mm">
           <button class="btn ghost" id="wk-cover">📊 What I've covered</button>
           <button class="btn ghost" id="wk-theme">Add a theme day</button>
@@ -898,11 +899,11 @@ body.pasting :is(.drow,.wk-b,.tt-c>button).t-class,body.pasting :is(.drow,.wk-b,
         <div class="bigbtns"><button class="btn primary big" id="g-go">Make the plan</button></div>
         <details class="sect" id="g-more"><summary>More: the whole week, options, lesson list</summary><div class="inner" style="display:flex;flex-direction:column;gap:10px">
           <div><button class="btn" id="g-week">Make the whole week</button></div>
-        <details class="sect" id="g-opts"><summary>Options <span class="small muted" id="g-optsum"></span></summary><div class="inner opts">
+        <div id="g-opts" class="opts" style="display:flex;flex-direction:column;gap:8px"><p class="small muted" style="margin:0"><b>Lesson extras</b> <span id="g-optsum"></span></p>
           <label class="check"><input type="checkbox" id="g-hooks"> <span><b>Exciting openers</b><br><span class="small muted">Start lessons with a hook, inspired by Teach Like a Pirate.</span></span></label>
           <label class="check"><input type="checkbox" id="g-score"> <span><b>Behaviour score</b><br><span class="small muted">The sub updates a class score out of 10 after each lesson and reveals it at the end.</span></span></label>
           <label class="check"><input type="checkbox" id="g-jq"> <span><b>Joke and quote of the day</b><br><span class="small muted">A fun start to the morning, linked to today's learning.</span></span></label>
-        </div></details>
+        </div>
         <details class="sect" id="g-incl"><summary>What to include in the printed plan</summary><div class="inner opts" id="g-incl-list"></div></details>
           <div class="gen-list" id="g-list"></div>
           <button class="linkbtn" id="g-again" hidden>Rewrite all lessons</button>
@@ -1015,6 +1016,7 @@ let schedDay="Mon", openRow=null;
 let saveSTimer=null, lastImg=S.ttImage||null;
 function flushS(){ if(!saveSTimer) return; clearTimeout(saveSTimer); saveSTimer=null; const {ttImage,...rest}=S; if(ttImage!==lastImg){ if(ttImage) save("subplanner.ttimg",ttImage); else try{ localStorage.removeItem("subplanner.ttimg"); }catch(e){} lastImg=ttImage||null; } save(LS_S,rest); try{ queueSync(); }catch(e){} }
 const saveS=()=>{ clearTimeout(saveSTimer); saveSTimer=setTimeout(flushS,250); }, saveP=()=>{ save(LS_P,P); try{ queueSync(); }catch(e){} };
+addEventListener("storage",e=>{ if(e.key!==LS_P&&e.key!==LS_S) return; try{ if(e.key===LS_P) P=e.newValue?JSON.parse(e.newValue):{}; else { const im=S.ttImage; clearTimeout(saveSTimer); saveSTimer=null; S=Object.assign(defaultSettings(),e.newValue?JSON.parse(e.newValue):{}); if(im&&!S.ttImage) S.ttImage=im; } }catch(_){ return; } try{ closeEditor(); if(document.getElementById("mdl")) closeModal(); const t=TABS.find(t=>!$("#tab-"+t).hidden); if(t) showTab(t); toast("Updated with changes from another tab."); }catch(_){} });
 
 /* ---------- helpers ---------- */
 const $=(s,el=document)=>el.querySelector(s);
@@ -1109,7 +1111,7 @@ function quickFill(d,start,end,after,rid,sx){ const k=dayKeyFor(d);
 function ttSuspects(){ const out=[]; if(!S.ttCheck) return out; const VOC=new Set(OCR_VOC.map(w=>w.toLowerCase()).concat(["ela","pe","ed","stem","prep","option","options","lit","num","dpa","french","cree"])); const days=weekDates(curDate); const ok=S.ttOk||[]; const starts={};
   DAYS.forEach(k=>(S.week[k]||[]).forEach(b=>{ (starts[b.start]=starts[b.start]||new Set()).add(k); }));
   DAYS.forEach((k,i)=>{ const d=days[i]; const list=sortBlocks(S.week[k]||[]);
-    list.forEach(b=>{ if(ok.includes(b.id)) return; const ws=String(cleanLabel(b.label)||"").toLowerCase().split(/[^a-z]+/).filter(Boolean); const known=(b.subject&&ws.length)||ws.some(w=>VOC.has(w))||!["class","specialist","option"].includes(b.type); if(b.weak||(typeof b.conf==="number"&&b.conf<60)||!known) out.push({k,d,id:b.id,start:b.start,end:b.end,kind:"b",label:b.label}); });
+    list.forEach(b=>{ if(ok.includes(b.id)) return; const ws=String(cleanLabel(b.label)||"").toLowerCase().split(/[^a-z]+/).filter(Boolean); const known=(b.subject&&ws.length)||ws.some(w=>VOC.has(w))||!["class","specialist","option"].includes(b.type); if(b.weak||(typeof b.conf==="number"&&b.conf<60)||!known||mins(b.end)<=mins(b.start)||list.some(o=>o!==b&&mins(o.start)<mins(b.end)&&mins(b.start)<mins(o.end))) out.push({k,d,id:b.id,start:b.start,end:b.end,kind:"b",label:b.label}); });
     Object.keys(starts).sort((a,b)=>mins(a)-mins(b)).forEach(s=>{ if(starts[s].has(k)||ok.includes(k+"|"+s)) return; if(list.some(b=>mins(b.start)<=mins(s)&&mins(b.end)>mins(s))) return; let e=null; DAYS.forEach(k2=>(S.week[k2]||[]).forEach(b=>{ if(b.start===s&&(!e||mins(b.end)<mins(e))) e=b.end; })); const nx=list.find(b=>mins(b.start)>mins(s)); if(nx&&mins(nx.start)<mins(e)) e=nx.start; out.push({k,d,start:s,end:e,kind:"gap"}); }); });
   out.sort((a,b)=>DAYS.indexOf(a.k)-DAYS.indexOf(b.k)||mins(a.start)-mins(b.start)); out.forEach((x,i)=>x.left=out.length-i);
   window.__sus=new Set(out.filter(x=>x.kind==="b").map(x=>x.id)); window.__miss=new Set(out.filter(x=>x.kind==="gap").map(x=>x.d+"|"+x.start)); return out; }
@@ -1129,7 +1131,7 @@ function renderSetupGrid(){ const g=$("#s-grid"); if(!g) return; const sus=ttSus
   g.querySelectorAll("th span").forEach(x=>x.remove()); wireAdds(g,renderWeek); wireCheck(g,sus); }
 function renderWeek(){ renderSetupGrid();
   $("#s-days").innerHTML=DAYS.map(d=>`<button data-d="${d}" aria-pressed="${d===schedDay}">${d}</button>`).join("");
-  $("#s-days").querySelectorAll("button").forEach(b=>b.onclick=()=>{schedDay=b.dataset.d; renderWeek();});
+  $("#s-days").querySelectorAll("button").forEach(b=>b.onclick=()=>{schedDay=b.dataset.d; renderWeek();}); { const sc=$("#s-copy"); if(sc) sc.textContent="Copy "+DAYNAMES[schedDay]+" to every day"; }
   const list=S.week[schedDay]=sortBlocks(S.week[schedDay]||[]);
   const box=$("#s-blocks");
   box.innerHTML=list.length?list.map(b=>`<button class="srow srowbtn ${typeClass(b)}" data-id="${b.id}"><span class="time">${t12(b.start)} to ${t12(b.end)}</span><span class="chip"><span class="dot"></span>${esc(showLabel(b))}</span><span class="sum">${esc(rowSummary(b))}${b.fixedActivity?" · repeats":""}</span><span class="edit">Change</span></button>`).join("")
@@ -1175,7 +1177,8 @@ function addFiles(list){ const ok=[...(list||[])].filter(f=>isPdf(f)||/^image\//
   upFiles=upFiles.concat(ok).slice(0,6); renderPages(); }
 function renderPages(){ const box=$("#u-pages"); $("#u-status").textContent=""; if(!upFiles.length){ box.hidden=true; box.innerHTML=""; $("#u-dt").textContent="📁 Upload file"; return; }
   box.hidden=false; $("#u-dt").textContent=upFiles.length+" page"+(upFiles.length>1?"s":"")+" added";
-  box.innerHTML=upFiles.map((f,i)=>`<figure class="u-pg"><div class="u-th" data-th="${i}">${isPdf(f)?"PDF":""}</div><figcaption class="small">Page ${i+1}</figcaption><button type="button" class="u-x" data-rmpg="${i}" aria-label="Remove page ${i+1}">✕</button></figure>`).join("")+`<p class="small muted" style="flex-basis:100%;margin:4px 0 0">${upFiles.length>1?"These get combined into one timetable. ":""}Now tap <b>Read my timetable</b>.</p>`;
+  box.innerHTML=upFiles.map((f,i)=>`<figure class="u-pg"><div class="u-th" data-th="${i}">${isPdf(f)?"PDF":""}</div><figcaption class="small">Page ${i+1}</figcaption><button type="button" class="u-x" data-rmpg="${i}" aria-label="Remove page ${i+1}">✕</button></figure>`).join("")+`<p class="small muted" style="flex-basis:100%;margin:4px 0 0">${upFiles.length>1?"These get combined into one timetable. ":""}</p><button type="button" class="btn primary big" data-readnow style="flex-basis:100%;justify-content:center">Read my timetable →</button>`;
+  { const rn=box.querySelector("[data-readnow]"); if(rn) rn.onclick=()=>$("#u-read").click(); setTimeout(()=>box.scrollIntoView({behavior:"smooth",block:"center"}),60); }
   upFiles.forEach((f,i)=>{ if(!isPdf(f)){ try{ const u=URL.createObjectURL(f); const el=box.querySelector(`[data-th="${i}"]`); el.style.backgroundImage=`url("${u}")`; }catch(e){} } });
   box.querySelectorAll("[data-rmpg]").forEach(x=>x.onclick=()=>{ upFiles.splice(+x.dataset.rmpg,1); renderPages(); }); }
 let camErr="";
@@ -1444,10 +1447,12 @@ function showParsed(pw,note){
     parsedWeek=pw; const st=$("#u-status"); const count=DAYS.reduce((a,d)=>a+pw[d].length,0); { const mx=Math.max(...DAYS.map(d=>pw[d].length)); const short=DAYS.filter(d=>pw[d].length&&pw[d].length<mx); if(short.length&&short.length<5) note=(note?note+" ":"")+`Look closely at ${short.map(d=>DAYNAMES[d]).join(", ")}: fewer blocks than your fullest day, so a few may be missing.`; }
     $("#u-result").innerHTML=`<div class="notice"><b>Found ${count} blocks across the week.</b> ${esc(note||"")}<div class="row" style="margin-top:10px"><button class="btn primary" id="u-use">${S.example?"Use this timetable":"Replace my timetable"}</button>${S.example?"":`<button class="btn" id="u-merge">Add to my timetable</button>`}<button class="btn ghost" id="u-cancel">Discard</button>${S.example?"":`<p class="small muted" style="margin-top:8px">Add keeps the blocks you already have (like music or library) and only adds new ones.</p>`}</div></div>
       <div class="slist" style="margin-top:8px">${DAYS.map(d=>`<div class="small"><b>${DAYNAMES[d]}:</b> ${parsedWeek[d].map(b=>`${t12(b.start,false)} ${b.color?`<span aria-hidden="true" style="display:inline-block;width:.8em;height:.8em;border-radius:2px;vertical-align:-1px;background:${esc(b.color)}"></span> `:""}${b.conf!=null&&b.conf<60?`<mark title="Hard to read. Check this one.">${esc(showLabel(b))} ?</mark>`:(b.weak?`<mark title="Re-read on its own. Glance at it.">${esc(showLabel(b))}</mark>`:esc(showLabel(b)))}${b.notes||b.who?` <i class="muted">(${esc([b.who,b.notes].filter(Boolean).join(", "))})</i>`:""}`).join(" · ")||"nothing found"}</div>`).join("")}</div>`;
-    $("#u-use").onclick=()=>{ const prevWeek=JSON.parse(JSON.stringify(S.week||{})), prevEx=S.example, prevImg=S.ttImage; if(!S.example) DAYS.forEach(d=>{ const used=new Set(); (parsedWeek[d]||[]).forEach(b=>{ const o=(S.week[d]||[]).find(x=>!used.has(x.id)&&x.start===b.start&&(x.end===b.end||(x.subject&&x.subject===b.subject))); if(o){ b.id=o.id; used.add(o.id); } }); }); S.ttCheck=true; S.ttOk=[]; window.__ttUndo=()=>{ S.week=prevWeek; S.example=prevEx; S.ttImage=prevImg; S.ttCheck=false; window.__ttUndo=null; saveS(); renderWeek(); try{ renderDay(); }catch(e){} toast("Back to your old timetable"); }; S.week=parsedWeek; S.example=false; S.ttImage=pendingImage||null; S.ttLayout=pendingLayout||null; S.ttView="table"; saveS(); $("#u-result").innerHTML=""; $("#u-status").textContent=""; renderWeek(); document.querySelector('[data-tab="setup"]').classList.add("done"); $("#u-text").value=""; const ud=$("#u-details"); ud.open=false; ud.scrollIntoView({behavior:"smooth",block:"start"});
+    $("#u-use").onclick=()=>{ const prevWeek=JSON.parse(JSON.stringify(S.week||{})), prevEx=S.example, prevImg=S.ttImage; if(!S.example) DAYS.forEach(d=>{ const used=new Set(); (parsedWeek[d]||[]).forEach(b=>{ const o=(S.week[d]||[]).find(x=>!used.has(x.id)&&x.start===b.start&&(x.end===b.end||(x.subject&&x.subject===b.subject))); if(o){ b.id=o.id; used.add(o.id); b.__m=1; } }); (parsedWeek[d]||[]).forEach(b=>{ if(b.__m){ delete b.__m; return; } const lb=x=>String(cleanLabel(x.label)||"").toLowerCase(); const o=(S.week[d]||[]).find(x=>!used.has(x.id)&&x.type===b.type&&((x.subject&&x.subject===b.subject)||(lb(x)&&lb(x)===lb(b)))&&mins(x.start)<mins(b.end)&&mins(b.start)<mins(x.end)); if(o){ b.id=o.id; used.add(o.id); } }); }); S.ttCheck=true; S.ttOk=[]; window.__ttUndo=()=>{ S.week=prevWeek; S.example=prevEx; S.ttImage=prevImg; S.ttCheck=false; window.__ttUndo=null; saveS(); renderWeek(); try{ renderDay(); }catch(e){} toast("Back to your old timetable"); }; S.week=parsedWeek; S.example=false; S.ttImage=pendingImage||null; S.ttLayout=pendingLayout||null; S.ttView="table"; saveS(); $("#u-result").innerHTML=""; $("#u-status").textContent=""; renderWeek(); document.querySelector('[data-tab="setup"]').classList.add("done"); $("#u-text").value=""; const ud=$("#u-details"); ud.open=false; ud.scrollIntoView({behavior:"smooth",block:"start"});
       const full=DAYS.filter(d=>(S.week[d]||[]).length), empty=DAYS.filter(d=>!(S.week[d]||[]).length);
       if(full.length&&empty.length){ toast(`Timetable loaded, but ${empty.map(d=>DAYNAMES[d]).join(", ")} came out empty. Tap the empty spots on the grid to fill them in, or try another photo.`,15000); }
-      else toast("Timetable loaded. Check the yellow spots.",15000,{label:"↶ Undo",fn:()=>window.__ttUndo&&window.__ttUndo()}); setTimeout(()=>{ const c=$("#tt-check"); if(c) c.scrollIntoView({behavior:"smooth",block:"start"}); },80); };
+      else { const ar=S.iTeachArabic?[]:DAYS.flatMap(d=>(S.week[d]||[]).filter(b=>/arabic/i.test(b.label||"")&&b.type!=="class")); const cl=DAYS.flatMap(d=>(S.week[d]||[]).filter(b=>b.type==="class")).length;
+        if(ar.length>=3&&ar.length>cl*2) toast(`Are the ${ar.length} Arabic blocks your own classes?`,20000,{label:"Yes, I teach them",fn:()=>{ const e=$("#s-iarabic"); if(e){ e.checked=true; e.dispatchEvent(new Event("change",{bubbles:true})); } renderWeek(); try{ renderDay(); }catch(x){} }}); }
+      setTimeout(()=>{ const c=$("#tt-check"); if(c) c.scrollIntoView({behavior:"smooth",block:"start"}); },80); };
     $("#u-cancel").onclick=()=>{ $("#u-result").innerHTML=""; $("#u-status").textContent=""; };
     const mg=$("#u-merge"); if(mg) mg.onclick=()=>{ let n=0; DAYS.forEach(d=>{ const cur=S.week[d]||[]; parsedWeek[d].forEach(b=>{ const clash=cur.some(x=>mins(x.start)<mins(b.end)&&mins(b.start)<mins(x.end)); if(!clash){ cur.push(b); n++; } }); S.week[d]=sortBlocks(cur); }); if(pendingImage&&!S.ttImage) S.ttImage=pendingImage; saveS(); $("#u-result").innerHTML=""; $("#u-status").textContent=""; renderWeek(); toast(n?`Added ${n} new blocks. Your blocks were kept.`:"Nothing new to add. Your blocks were kept."); };
     st.textContent="Check the result, then tap the blue button."; st.className="status good";
@@ -1538,6 +1543,8 @@ function blockFormHTML(b,p){
 function dayProg(d){ const bl=(dayBlocks(d)||[]).filter(b=>b.type==="class"); if(!bl.length) return ""; const x=P[d]; const done=bl.filter(b=>{ const y=x?.blocks?.[b.id]; return y&&(y.code||y.objective||y.activity||y.lesson||String(y.mine||"").trim()); }).length; const t=x?.reportDone&&x?.report&&Object.keys(x.report).length?"📝 Report in":x?.printedAt&&x?.generated?"🖨 Printed":x?.generated&&bl.every(b=>x.blocks?.[b.id]?.lesson)?"✓ Ready":done?`${done} of ${bl.length} planned`:""; return t?`<em class="dprog ${x?.printedAt||x?.generated?"ok":""}">${t}</em>`:""; }
 function renderDay(){
   $("#d-example").hidden=!S.example; document.querySelectorAll("#d-example [data-go]").forEach(b=>b.onclick=()=>showTab(b.dataset.go));
+  { const fe=$("#d-emergency"); if(fe) fe.textContent="⚡ Fill "+DAYNAMES[dayKeyFor(curDate)]+"'s empty blocks"; }
+  { const dr=$("#d-report"); if(dr){ const pl=P[curDate]; const show=curDate<todayISO()&&pl&&pl.generated&&Object.values(pl.blocks||{}).some(x=>x&&x.lesson); dr.hidden=!show; dr.textContent=pl&&pl.reportDone?"📝 Change the sub report":"📝 How did this day go?"; dr.onclick=()=>openReport(curDate); } }
   renderWeekGrid(); renderThemeBanner(); try{ renderLastWeek(); renderTodayCard(); renderReportCard(); renderRecap(); }catch(e){} $("#d-date").value=curDate;
   const box=$("#d-blocks"), blocks=dayBlocks(curDate), plan=planFor(curDate);
   if(!box) return;
@@ -1640,7 +1647,7 @@ function pasteInto(date,b){ const plan=planFor(date); const prev=plan.blocks[b.i
   else if(!(prev&&(prev.code||prev.lesson))&&tgtSubj&&CLIP.p.subject&&tgtSubj!==CLIP.p.subject&&!confirm(`${t12(b.start,false)} is ${sn(tgtSubj)}. Put ${CLIP.label} there instead?`)) return;
   const c=JSON.parse(JSON.stringify(CLIP.p)); delete c.spanId; delete c.part; delete c.parts;
   if(CLIP.date===date) c.copyOf=CLIP.id; else delete c.copyOf;
-  if(c.lesson&&Array.isArray(c.lesson.steps)){ const fx=fixSteps(c.lesson.steps,dur(b)); c.lesson.steps=fx; }
+  if(c.lesson&&Array.isArray(c.lesson.steps)){ const fx=fixSteps(c.lesson.steps,dur(b),!!String(c.mine||"").trim()); c.lesson.steps=fx; }
   plan.blocks[b.id]=c; plan.generated=!!(prevGen&&c.lesson&&(!S.wsOn||!needWS(c)||c.worksheet)); saveP();
   lastPaste={date,id:b.id,prev,prevGen}; CLIP=null; renderClip(); renderDay(); if(!$("#tab-gen").hidden) renderGen();
   announce(`Pasted into ${t12(b.start,false)}.`);
@@ -1845,6 +1852,10 @@ ${p.noprep?"":`- Low prep. Assume only a whiteboard, paper, pencils, pencil cray
 - Every activity must make students think and produce something (explain, compare, justify, solve, create). No filler. Include what to look for, a support for weak readers and a challenge for strong students.
 - Write to ${isSub()?"the sub":"the teacher"} in short, plain sentences. Each step says exactly what to do and say. Put words to say to students in quotes.
 - 4 to 8 steps. Step minutes must add up to exactly ${minutes}. Start with a warm-up that gets attention and states the goal. End with a wrap-up.
+- The sub may not know this topic. Write out the real content: the facts to teach, one worked example with its answer, and every question with its answer. Never write "give an example", "ask a question about" or leave blanks for the sub to fill.
+- Use I do, we do, you do: the sub models one example, the class does one together, then students practise the outcome's own task. The wrap-up checks the outcome with one specific question and its answer.
+- Keep each step under 70 words. Say how students move between steps (attention signal, who moves when).${gnum(grade)<=2?" Kindergarten to Grade 2: no seated part longer than 10 minutes.":""}${minutes<35?" Under 35 minutes: 4 steps, no brain break.":""}
+- Numbers, words and texts must fit Grade ${grade}. Do not go beyond the outcome.${p.subject==="arabic"?"\n- Write every Arabic word in Arabic script with transliteration and the English meaning, like كِتاب (kitaab) = book. The sub may not read Arabic.":""}
 - Student tasks must work for weak readers: read directions aloud, partners allowed.
 - Never use student names. Do not use em dashes.
 - Stay on this block's subject and outcome for the whole lesson. Do not switch to another subject's topic. If the teacher's activity idea or notes clearly belong to a different subject, leave them out (a one-line cross-curricular link at the end is fine).
@@ -1855,7 +1866,7 @@ ${p.noprep?"":`- Low prep. Assume only a whiteboard, paper, pencils, pencil cray
 }
 function stripLesson(L){ const {source,...r}=L; return r; }
 function normLesson(j){
-  if(!j||!Array.isArray(j.steps)||!j.steps.length) return null;
+  if(!j||!Array.isArray(j.steps)||!j.steps.length) return null; j={...j,steps:j.steps.map(s=>typeof s==="string"?{text:s}:s).filter(s=>s&&typeof s==="object"&&String(s.text||s.name||"").trim()),materials:Array.isArray(j.materials)?j.materials:j.materials?[j.materials]:[]}; if(!j.steps.length) return null;
   return {title:String(j.title||"Lesson"),objective:String(j.objective||""),materials:(j.materials||[]).map(String),
     steps:j.steps.map(s=>({minutes:Math.max(0,Math.round(+s.minutes||0)),kind:String(s.kind||"activity").toLowerCase(),name:String(s.name||""),text:String(s.text||""),look:String(s.look||"")})),
     support:String(j.support||""), extend:String(j.extend||""), board:Array.isArray(j.board)&&j.board.length>=9?j.board.slice(0,9).map(String):null,
@@ -1982,7 +1993,8 @@ function attendGroups(){ const out=[]; let cur={name:"",names:[]}; String(S.clas
 function privacyHits(){ const names=(S.classlist||"").split(/\n/).map(x=>x.trim()).filter(x=>x.length>2); const fields=["students","helpers","behaviour","medical","important","general"]; const hits=[];
   fields.forEach(k=>{ const v=String(S[k]||""); names.forEach(n=>{ const parts=n.split(/\s+/); if(parts.length>1&&new RegExp("\\b"+parts.map(x=>x.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")).join("\\s+")+"\\b","i").test(v)) hits.push(n); }); if(/\b(ADHD|autism|autistic|IPP|diagnos|anxiety disorder|ODD|FASD|epilep|diabet)/i.test(v)&&k!=="medical") hits.push("health words in "+k); });
   return [...new Set(hits)]; }
-function sheetHTML(date,exporting){
+let FOOT_SEEN=new Set();
+function sheetHTML(date,exporting){ FOOT_SEEN=new Set();
   const blocks=dayBlocks(date)||[], plan=planFor(date); if(!blocks.length) return "";
   const sub=isSub(); const who=[S.teacher,S.room?"Room "+S.room:""].filter(Boolean).map(esc).join(", "); const title=(sub?"Substitute Plan":"Lesson Plan")+(who?": "+who:"");
   const meta=[S.grade?`Grade ${esc(S.grade)}`:"",`Date: <b>${esc(prettyDate(date))}</b>`,S.layout?esc(bul(S.layout)[0]):""].filter(Boolean).join(" &nbsp;|&nbsp; ");
@@ -1990,7 +2002,7 @@ function sheetHTML(date,exporting){
   if(sub&&incl("welcome")) h+=`<section class="pd-c pd-blue"><h3>Hi ${esc(plan.subName||"there")}, welcome to ${S.room?"Room "+esc(S.room):"our class"}!</h3><p>Thank you so much for covering my class today. I really appreciate it. Everything you need is in this plan, step by step. Have a great day with my students!</p><p class="sig">${esc(S.teacher||"")}</p></section>`;
   if(sub){ const bb=[["Medical and safety",S.medical,"medical"],["Office",S.office,"office"],["Where things are",S.materials,"materials"],["Dismissal",S.dismissal,"dismissal"],["Emergency",S.emergency,"emergency"]].filter(x=>x[1]&&(x[2]==="office"||incl(x[2])));
     const nWS=S.wsOn?blocks.filter(b=>b.type==="class"&&bp(plan,b).worksheet).length:0; const kids=attendGroups().reduce((a,g)=>a+g.names.length,0);
-    const glance=blocks.map(b=>{ const p=plan.blocks[b.id]; const what=b.type==="class"&&p?.subject?nameFor(b,p,true):showLabel(b,p); const note=isDuty(b)?"Supervision duty":(b.type==="duty"||b.type==="recess")&&b.duty?"No duty, break":b.type==="specialist"||b.type==="prep"?(b.mode===SPEC_MODES[1]?"Specialist comes to our room":/takes/i.test(b.who||"")?esc(b.who):(b.who?esc(b.who):"Other teacher")+" takes them"):b.type==="lunch"||b.type==="recess"?"Break":""; return `<tr><td>${t12(b.start,false)}</td><td>${esc(what)}</td><td>${note}</td></tr>`; }).join("");
+    const glance=blocks.map(b=>{ const p=plan.blocks[b.id]; const what=b.type==="class"&&p?.subject?nameFor(b,p,true):showLabel(b,p); const W=esc(b.who||b.label||"Other teacher"), GS=attendGroups(); const note=isDuty(b)?`<b>Your duty: ${esc(b.duty)}</b>`:(b.type==="duty"||b.type==="recess")&&b.duty?"No duty, break":b.type==="specialist"||b.type==="prep"?(b.mode===SPEC_MODES[0]?`Walk them to ${W}. <b>Pick up ${t12(b.end,false)}</b>`:b.mode===SPEC_MODES[1]?`${W}. You stay and help`:b.mode===SPEC_MODES[2]?`${W} comes to our room`:b.mode===SPEC_MODES[3]||b.prep?`Drop off at ${W}. Your break. <b>Pick up ${t12(b.end,false)}</b>`:/takes/i.test(b.who||"")?esc(b.who):W+" takes them"):b.type==="lunch"?(GS.length>1&&/^(PM|Afternoon)\b/i.test(GS[1].name||"")?`Break. <b>${esc(GS[1].name)} group after lunch</b>`:"Break"):b.type==="recess"?"Break":""; return `<tr><td>${t12(b.start,false)}</td><td>${esc(what)}</td><td>${note}</td></tr>`; }).join("");
     const entry=blocks.find(b=>b.type==="entry"||/entry|arriv|bell|door/i.test(b.label||""))||blocks[0];
     const first=entry?`<p><b>First:</b> ${t12(entry.start,false)}, ${esc(showLabel(entry))}${entry.notes?`. ${esc(entry.notes)}`:""}</p>`:"";
     const today=plan.dayNote&&plan.dayNote!=="Emergency sub plan"&&!/^Emergency plan:/.test(plan.dayNote)?`<p><b>Today only:</b> ${esc(plan.dayNote)}</p>`:"";
@@ -2045,7 +2057,7 @@ function lessonCard(b,p,exporting){
   const wsOn=S.wsOn&&p.worksheet; let wsIdx=-1; const isMine=/mine/.test(L.source||""); if(wsOn&&isMine){ let mi=L.steps.findIndex(st=>/work\s?sheet|sheet|handout|booklet|packet|page/i.test(st.text||"")); wsIdx=-2; L=JSON.parse(JSON.stringify(L)); if(mi<0) mi=L.steps.findIndex(st=>/practice|partner/.test(st.kind||"")); if(mi>=0) L.steps[mi].text+=` (Worksheet: "${p.worksheet.title}" is in the Worksheets packet.)`; } if(wsOn&&!isMine){ L.steps.forEach((st,i)=>{ if(/practice/.test(st.kind||"")&&!/station|choice/i.test(st.name||"")) wsIdx=i; }); if(wsIdx<0) L.steps.forEach((st,i)=>{ if(/game|teach/.test(st.kind||"")&&wsIdx<0&&i>0) wsIdx=i; }); }
   const wsTitles=wsOn?(()=>{ const vs=[p.worksheet,...(S.levels?(p.wsLevels||[]):[])].filter(Boolean); const same=vs.every(v=>v.title===vs[0].title); return same?`${vs[0].title}${S.levels?" ● ■ ▲":""}`:vs.map(W=>(W.level!=null&&S.levels?LVL_SYM[String(W.level)]+" ":"")+W.title).join(", "); })():"";
   const steps=L.steps.map((st0,i)=>{ const st=i===wsIdx?{...st0,name:"📄 Worksheet time",text:`Hand out "${S.levels?wsTitles:p.worksheet.title}" from the Worksheets packet.${S.levels?" Give everyone ■. Use ● for anyone who can't read the first question. Early finishers get ▲.":" Early finishers do the last part."} Read the instructions together. Students work quietly or with a partner. Collect what they did, finished or not.`,look:"Students are working on their own and using the passage or examples to answer."}:st0; const at=t; t+=(+st.minutes||0); return `<li${i===wsIdx?' class="pd-wsstep"':""}><b>${esc(st.name||KIND_LABEL[st.kind]||"Step")}</b> <span class="pd-t">${t12(hhmm(at),false)} · ${+st.minutes||0} min</span><br>${esc(SH&&i!==wsIdx?brief(st.text):st.text)}${st.look&&!SH?`<div class="pd-look">Look for: ${esc(st.look)}</div>`:""}</li>`; }).join("");
-  const mov=["pe","music","art"].includes(p.subject); const foot=(SH?[[mov?"Support":"Support for struggling readers",L.support],["Done early",L.early],[isSub()?"Leave for me":"Collect",L.check],["Teacher note",p.notes]]:[[mov?"Support":"Support for struggling readers",L.support],["Challenge for strong students",L.extend],["Done early",L.early],[isSub()?"Leave for me":"Collect",L.check],["Tip",L.subTip],["Teacher note",p.notes]]).filter(x=>x[1]);
+  const mov=["pe","music","art"].includes(p.subject); const foot=(SH?[[mov?"Support":"Support for struggling readers",L.support],["Done early",L.early],[isSub()?"Leave for me":"Collect",L.check],["Teacher note",p.notes]]:[[mov?"Support":"Support for struggling readers",L.support],["Challenge for strong students",L.extend],["Done early",L.early],[isSub()?"Leave for me":"Collect",L.check],["Tip",L.subTip],["Teacher note",p.notes]]).filter(x=>x[1]).map(x=>{ if(x[0]==="Teacher note") return x; const k=x[0]+"|"+String(x[1]).trim(); if(FOOT_SEEN.has(k)) return [x[0],"Same as earlier today."]; FOOT_SEEN.add(k); return x; }).filter(x=>!(x[1]==="Same as earlier today."&&/^Support|^Challenge|^Tip/.test(x[0])));
   return `<section class="pd-c pd-blk ${subjClass(p.subject)||"t-class"} pd-subj" data-lc="${b.id}">${head}
     ${L.objective&&!(S.short&&cur)&&!(()=>{ const nz=x=>String(x||"").toLowerCase().replace(/[^a-z ]/g,"").replace(/\s+/g," ").trim(); const ob=nz(L.objective).replace(/^(students will|i can|we will|learn to|today we will)\s*/,""); return !!ob&&[o&&o.text,it&&it.text].some(t=>{ const tt=nz(t); return tt&&(tt.includes(ob.slice(0,40))||ob.includes(tt.slice(0,40))); }); })()?`<p><b>Learning goal:</b> ${esc(L.objective)}</p>`:""}${cur}
     ${L.materials?.length?`<p><b>You need:</b> ${L.materials.map(esc).join(", ")}</p>`:""}${resHTML(p)}
@@ -2151,7 +2163,7 @@ RULES:
 Reply with only JSON:
 {"title":"fun worksheet title","instructions":"one or two short sentences","wordBank":["..."],"questions":[{"q":"question text","lines":2}],"draw":"drawing task, or empty string","bonus":"one challenge question, or empty string","answers":["short answer key, one per question"]}`;
 }
-function normWS(j){ if(!j||!Array.isArray(j.questions)||!j.questions.length) return null;
+function normWS(j){ if(!j||!Array.isArray(j.questions)||!j.questions.length) return null; j={...j,questions:j.questions.map(q=>typeof q==="string"?{q}:q).filter(q=>q&&typeof q==="object"&&String(q.q||q.question||"").trim()),wordBank:Array.isArray(j.wordBank)?j.wordBank:[],answers:Array.isArray(j.answers)?j.answers:[]}; if(!j.questions.length) return null;
   return {title:String(j.title||"Worksheet"),instructions:String(j.instructions||""),wordBank:(j.wordBank||[]).map(String).filter(Boolean),questions:j.questions.map(q=>({q:String(q.q||q.question||""),lines:Math.min(5,Math.max(0,Math.round(+q.lines||2)))})),draw:String(j.draw||""),bonus:String(j.bonus||""),answers:(j.answers||[]).map(String)}; }
 async function writeWorksheet(b,p,lvl=0){
   const sample=aiBlocked?null:await samplePromise;
@@ -2249,9 +2261,9 @@ function wsVers(p){ return [p.worksheet,...(S.levels?(p.wsLevels||[]):[])].filte
 function wsAll(date,opts={}){ const list=wsBlocks(date,opts.only); if(!list.length) return "";
   const kids=attendGroups().reduce((a,g)=>a+g.names.length,0);
   const kidsAt=b=>{ const gs=attendGroups(); const am=gs.find(g=>/^(AM|Morning)\b/i.test(g.name)), pm=gs.find(g=>/^(PM|Afternoon)\b/i.test(g.name)); if(!am||!pm) return kids; return (String(b.start)<"12:00"?am:pm).names.length; };
-  const cover=opts.cover?`<section class="ws ws-cover"><div class="tag">Teacher: copy these · Sub: hand them out · not for students</div><h2>Worksheets for ${esc(prettyDate(date))}</h2><table class="ws-ct"><tr><th>Time</th><th>Lesson</th><th>Worksheet</th><th>Copies</th></tr>${list.map(({b,p})=>`<tr><td>${t12(b.start,false)}</td><td>${esc(nameFor(b,p,true))}</td><td>${wsVers(p).map(W=>(W.level!=null?LVL_SYM[String(W.level)]+" ":"")+esc(W.title)).join("<br>")}</td><td>${wsVers(p).map(W=>{ const kids=kidsAt(b); const lv=W.level; const sp=Math.max(3,Math.round(kids*.2)); const n=!kids?"":!S.levels||lv==null||lv===0?kids:sp; return (lv!=null&&S.levels?LVL_SYM[String(lv)]+" ":"")+(n?`× ${n}`:"one each"); }).join("<br>")}</td></tr>`).join("")}</table>
+  const cover=opts.cover?`<section class="ws ws-cover"><div class="tag">Teacher: copy these · Sub: hand them out · not for students</div><h2>Worksheets for ${esc(prettyDate(date))}</h2><table class="ws-ct"><tr><th>Time</th><th>Lesson</th><th>Worksheet</th><th>Copies</th></tr>${list.map(({b,p})=>`<tr><td>${t12(b.start,false)}</td><td>${esc(nameFor(b,p,true))}</td><td>${wsVers(p).map(W=>(W.level!=null?LVL_SYM[String(W.level)]+" ":"")+esc(W.title)).join("<br>")}</td><td>${wsVers(p).map(W=>{ const kids=kidsAt(b); const lv=W.level; const sp=Math.max(2,Math.round(kids*.12)); const n=!kids?"":!S.levels||lv==null||lv===0?kids:sp; return (lv!=null&&S.levels?LVL_SYM[String(lv)]+" ":"")+(n?`× ${n}`:"one each"); }).join("<br>")}</td></tr>`).join("")}</table>
     ${S.levels?`<p><b>Who gets which level?</b> Give everyone <b>■</b>. Swap to <b>●</b> for anyone who can't read the first question to you. Early finishers get <b>▲</b>. Students only see the shape.</p>`:""}
-    <p><b>Copying:</b> print double-sided and staple each sheet.${kids&&S.levels?" ■ is one per student. ● and ▲ are a few spares.":""}</p>
+    <p><b>Copying:</b> print double-sided and staple each sheet.${kids&&S.levels?" ■ is one per student. ● and ▲ are a couple of spares.":""}</p>
     <p>Answer keys are at the very end. Don't photocopy those pages.</p></section>`:"";
   const sheets=list.map(({b,p})=>wsVers(p).filter(W=>opts.lv==null||opts.lv===""||String(W.level??"")===String(opts.lv)).map(W=>(opts.tools?`<div class="ws-tools noprint"><b>${esc(nameFor(b,p,true))} · ${t12(b.start,false)}</b>${W.level!=null?" "+LVL_SYM[String(W.level)]:""} <button class="btn" data-ws1="${b.id}" data-wslv="${W.level??""}">🖨 Print just this one</button></div>`:"")+wsHTML(b,p,W)).join("")).join("");
   const keyOf=(W,b,p)=>{ const fk=b?funFor(b,p,W).key:[]; const all=[...(W.answers||[]),...fk]; return all.length?`<div><h3 style="font-size:16px;margin-top:10px">${W.level!=null?LVL_SYM[String(W.level)]+" ":""}${esc(W.title)}</h3><div class="keylist">${all.map(a=>`<div>${esc(a)}</div>`).join("")}</div></div>`:""; };
@@ -2281,8 +2293,8 @@ function pickFocusSet(o,p){
   else { const us=it.map((x,i)=>x.tag==="U"?i:-1).filter(i=>i>=0); if(us.length) start=us[Math.floor(rng(p.code+(p.seed||0))()*us.length)]; }
   let end=it.length; for(let i=start+1;i<it.length;i++){ if(it[i].tag==="U"){ end=i; break; } }
   const block=it.slice(start,end);
-  const U=block.find(x=>x.tag==="U"||x.tag==="C")||null;
-  const K=block.filter(x=>x.tag==="K"||(x.tag==="C"&&x!==U));
+  const U0=block.find(x=>(x.tag==="U"||x.tag==="C")&&!/^Component \d/i.test(String(x.text)))||null; const U=U0&&{...U0,text:String(U0.text).replace(/^[A-H]\.\s+/,"")};
+  const K=block.filter(x=>(x.tag==="K"||(x.tag==="C"&&x!==U0))&&!/^Component \d/i.test(String(x.text)));
   const Sk=block.filter(x=>x.tag==="S");
   const selItem=sel>=0?it[sel]:null;
   return {U,K,Sk,selItem};
@@ -2353,6 +2365,7 @@ function chooseAct(kind,{subject,grade,minutes,text,req,r,exclude=[]}){
     if((a.subjects||[]).includes(subject)) sc+=1.5;
     if((a.kind==="practice"||a.kind==="pe-skill")&&(a.keywords||[]).length>2&&!hit&&!(a.subjects||[]).includes("any")) sc-=3.5;
     if(minutes&&a.min&&a.max){ if(minutes>=a.min&&minutes<=a.max) sc+=1; else if(minutes<a.min) sc-=2; }
+    if(/^(Desk Museum|Grade the Teacher|Shrink Ray|Suspect Lineup|The Weird Fact Drop|Big Question Reveal|Tell It as a Story|Mnemonic Maker|Question Staircase|What Is In My Hand\?|Dramatic Countdown|Picture It)$/.test(a.name||"")&&isSub()) sc-=8;
     if(g<=2&&/\bcopy\b|copies|notebook|sticky note|write (two|three|2|3|a paragraph|sentences)|paragraph|definition/i.test((Array.isArray(a.steps)?a.steps.join(" "):String(a.steps||""))+" "+(a.name||""))) sc-=5;
     if(req.calm){ if(a.energy==="active") sc-=4; if(a.energy==="calm") sc+=1.5; }
     if(req.active){ if(a.energy==="active") sc+=3; if(a.energy==="calm") sc-=1; }
@@ -2392,11 +2405,12 @@ function questionsFrom(K,Sk,o){
   if(!qs.length) (o?.focus||[]).slice(0,3).forEach(f=>qs.push(`What do you know about ${f.replace(/\.$/,"").toLowerCase()}?`));
   return qs;
 }
-function fixSteps(steps,n){ steps=(steps||[]).filter(Boolean); if(!steps.length) return steps; n=Math.max(1,+n||0);
+function fixSteps(steps,n,noCap){ steps=(steps||[]).filter(Boolean); if(!steps.length) return steps; n=Math.max(1,+n||0);
   if(n<15){ const keep=steps.find(x=>/practice|game/.test(x.kind))||steps[0]; return [{...keep,minutes:n,name:"Quick review: "+(keep.name||"practice")}]; }
-  let out=[]; steps.forEach(st=>{ let m=Math.max(2,Math.round(+st.minutes||0)); if(m>30&&!/^Station/.test(st.name||"")){ const parts=Math.ceil(m/25); for(let i=0;i<parts;i++) out.push(i===0?{...st,minutes:Math.round(m/parts)}:{kind:"break",name:i%2?"Brain break, then keep going":"Keep going",minutes:Math.round(m/parts),text:i%2?"Stand, stretch for one minute, then students continue the same task. Check in with a new group of students.":"Students continue. Walk around and check work. Pair anyone who is stuck with a helper."}); } else out.push({...st,minutes:m}); });
+  let out=[]; steps.forEach(st=>{ let m=Math.max(2,Math.min(n,Math.round(+st.minutes||0))); if(m>30&&!/^Station/.test(st.name||"")){ const parts=Math.ceil(m/25); for(let i=0;i<parts;i++) out.push(i===0?{...st,minutes:Math.round(m/parts)}:{kind:"break",name:i%2?"Brain break, then keep going":"Keep going",minutes:Math.round(m/parts),text:i%2?"Stand, stretch for one minute, then students continue the same task. Check in with a new group of students.":"Students continue. Walk around and check work. Pair anyone who is stuck with a helper."}); } else out.push({...st,minutes:m}); });
   let tot=out.reduce((a,x)=>a+x.minutes,0), diff=n-tot; let i=out.length-1; let guard=0;
   while(diff!==0&&guard++<500){ const st=out[i]; if(diff>0){ st.minutes++; diff--; } else if(st.minutes>2){ st.minutes--; diff++; } i=(i-1+out.length)%out.length; }
+  out.forEach(st=>{ if(noCap||st.mine||st.minutes>5||!st.text) return; const t=String(st.text); if(t.split(/\s+/).length<=45) return; const ss=t.split(/(?<=[.!?])\s+(?=[A-Z"“(])/); if(ss.length<=2) return; const keep=ss.slice(0,2); ss.slice(2).forEach(x=>{ if(/answer|\bsay\b|:\s*$/i.test(x)&&keep.join(" ").split(/\s+/).length<60) keep.push(x); }); st.text=keep.join(" "); });
   return out; }
 function mineClean(txt){ let L=String(txt||"").replace(/\r/g,"").split("\n");
   const junk=/^\s*(thanks|thank you|cheers|best|regards|sincerely|hi|hello|hey|good morning|dear)\b[\s\S]{0,40}$|^\s*sent from my|^\s*[-–—_]{2,}\s*$|^\s*(—|-)\s*\w+\s*$/i;
@@ -2407,8 +2421,8 @@ function mineSplit(txt){ txt=mineClean(txt); if(!txt) return {parts:[],mats:[]};
   const MIN=/\(?\b(\d{1,3})\s*(?:minutes|mins|min)\b\)?/i;
   let parts=txt.split(/\n+|(?:^|\s)(?=\d+[.)]\s)/).map(x=>x.replace(/^\s*(?:\d+[.)]|[-*•])\s*/,"").trim()).filter(Boolean);
   if(parts.length<=1){
-    let t=txt.replace(/([.!?])\s+/g,"$1\u0001").replace(/(\(\s*\d{1,3}\s*(?:minutes|mins|min)\s*\))\s*,?\s*/gi,"$1\u0001").replace(/\s*[,;]\s*(?:and\s+)?(?=(?:then|next|after that|afterwards|finally|last|lastly)\b)/gi,"\u0001").replace(/\s+(?=then\s)/gi,"\u0001").replace(/\s*,\s*(?=(?:collect|early finishers|students|they|kids|partners|exit|share|clean|tidy|read|write|draw|sort|watch|play|finish|end|last)\b)/gi,"\u0001");
-    parts=t.split("\u0001").map(x=>x.trim().replace(/^[,;.]\s*/,"")).filter(x=>/[a-z]/i.test(x));
+    let t=txt.replace(/\b(p|pg|pgs|pp|no|ex|q|qs|ch|vol|mr|mrs|ms|dr|e\.g|i\.e)\.\s+(?=[\d#(a-z])/gi,"$1.\u0002").replace(/([.!?])\s+/g,"$1\u0001").replace(/\u0002/g," ").replace(/(\(\s*\d{1,3}\s*(?:minutes|mins|min)\s*\))\s*,?\s*/gi,"$1\u0001").replace(/\s*[,;]\s*(?:and\s+)?(?=(?:then|next|after that|afterwards|finally|last|lastly)\b)/gi,"\u0001").replace(/\s+(?=then\s)/gi,"\u0001").replace(/\s*,\s*(?=(?:collect|early finishers|students|they|kids|partners|exit|share|clean|tidy|read|write|draw|sort|watch|play|finish|end|last)\b)/gi,"\u0001");
+    parts=t.split("\u0001").map(x=>x.trim().replace(/^[,;.]\s*/,"")).filter(x=>/[a-z0-9]/i.test(x));
     parts=parts.reduce((acc,x)=>{ const w=x.split(/\s+/).length; if(acc.length&&(w<4)&&!MIN.test(x)&&!MIN.test(acc[acc.length-1])) acc[acc.length-1]=acc[acc.length-1].replace(/[.]$/,"")+", "+x; else acc.push(x); return acc; },[]); }
   parts=parts.filter(x=>/[a-z0-9]/i.test(x)); let mats=[]; parts=parts.filter(x=>{ const m=x.match(/^materials?\s*:\s*(.+)/i); if(m){ mats=m[1].split(/,|;/).map(z=>z.trim()).filter(Boolean); return false; } return true; });
   while(parts.length>12){ let bi=0, bl=1e9; for(let i=0;i<parts.length-1;i++){ if(MIN.test(parts[i])&&MIN.test(parts[i+1])) continue; const l=parts[i].length+parts[i+1].length; if(l<bl){ bl=l; bi=i; } } parts.splice(bi,2,parts[bi].replace(/[.]$/,"")+". "+parts[bi+1]); }
@@ -2440,7 +2454,7 @@ function mineLesson(b,p){ const {o,minutes}=ctx(b,p); const M=mineSteps(p.mine,m
   return {title,objective:p.objective||(p.code&&o&&!o.auto&&o.text?o.text:""),materials:M.mats,steps:steps.map(({given,...x})=>x),source:"mine",subTip:tip}; }
 function arWords(p){
   const wk=String(S.arWeek||"").split(/\n/).map(l=>l.trim()).filter(Boolean).map(l=>{ const m=l.match(/^(.+?)\s*(?:\((.+?)\))?\s*[=:-]\s*(.+)$/); if(!m) return null; const a=m[1].trim(); const isAr=/[\u0600-\u06FF]/.test(a); return {ar:isAr?a:(m[2]||a),tr:isAr?(m[2]||""):a,en:m[3].trim()}; }).filter(Boolean);
-  const themes=["general","health","science","social","art","math"]; const wkn=Math.floor((new Date((curDate||todayISO())+"T12:00:00")-new Date("2026-09-01T12:00:00"))/6048e5); const theme=themes[((wkn%themes.length)+themes.length)%themes.length];
+  const themes=["general","health","science","social","art","math"]; const wkn=Math.floor((new Date((curDate||todayISO())+"T12:00:00")-new Date("2026-08-31T12:00:00"))/6048e5); const theme=themes[((wkn%themes.length)+themes.length)%themes.length];
   const GOT={1:"health",2:"ela",3:"science",4:"ela",5:"social",6:"general",7:"social"}; const mGo=String(p.code||"").match(/^ARA-[K0-9]+-(\d)$/); const th=mGo&&GOT[mGo[1]]?GOT[mGo[1]]:theme;
   const g=gnum(p.grade||S.grade); const BASIC=/^(red|blue|green|yellow|orange|purple|pink|black|white|brown|grey|gray|circle|square|triangle|rectangle|star|one|two|three|four|five|six|seven|eight|nine|ten|cat|dog|ball|sun|moon|book|pen|eye|hand|nose|ear|mom|dad)$/i;
   const cx=x=>String(x.en).length+String(x.tr).length*0.6+(x.en.includes(" ")?3:0);
@@ -2465,7 +2479,7 @@ function arabicLesson(b,p){ const n=dur(b); const r=rng((curDate||"")+(b.id||"")
   const steps=[
     {minutes:m[0],kind:"warm-up",name:"Arabic greeting",text:`Greet the whole class: "Sabah al-khayr" (صباح الخير, good morning). They answer "Sabah an-nur" (صباح النور). Ask 2 or 3 students "Kayf halak?" / "Kayf halik?" (how are you, to a boy / to a girl). They answer "Al-hamdu lillah" (fine, thank God).`},
     {minutes:m[1],kind:"teach",name:"Today's 6 words",text:`Write each word on the board with how to say it. Say it, the class repeats it 3 times, then add an action or a quick drawing. Words: ${list}. Don't read Arabic? Read the transliteration in brackets. Your students will happily help you.${g>=3&&!wk.length?" Then say each English word and students write the Arabic word on paper (dictation, imlaa'). Check together.":""}`},
-    picked?{minutes:m[2],kind:"partner",name:"Today's task",text:`${O.activity} Use today's words where they fit. Students who finish early make flashcards of the 6 words.`}:{minutes:m[2],kind:"partner",name:"Flashcard partners",text:g<=1?`Partners fold a paper into 6 boxes and draw one of the words in each box. Then they point and say the Arabic word to each other.`:`Partners fold a paper into 6 boxes. In each box they write one Arabic word in Arabic letters and draw a picture of it. Then they quiz each other: one points, the other says the word in Arabic.`},
+    picked?{minutes:m[2],kind:"partner",name:"Today's task",text:`${O.activity} Use today's words where they fit. Students who finish early make flashcards of the 6 words.`}:(()=>{ const wd=new Date((curDate||todayISO())+"T12:00:00").getDay(); const alt=g>=2&&wd===2?{name:"Picture dictionary",text:"Partners fold a paper into 6 boxes. In each box: the Arabic word, how to say it, the English meaning and a small drawing. They read their page to each other."}:g>=3&&wd===3?{name:"Sentence builders",text:`Each student writes 3 sentences, each with one of today's Arabic words in it. Starters on the board: "I can see ___." "I like ___." "A ___ is ...". Example: "${words[0].tr} (${words[0].ar}) means ${words[0].en}." Partners read them to each other.`}:g>=2&&wd===5?{name:"Partner quiz",text:"Partners take turns: one says an English word from the board, the other says it in Arabic (Grade 3 and up also write it). Swap after 6 words and count how many each got right."}:null; return alt?{minutes:m[2],kind:"partner",...alt}:null; })()||{minutes:m[2],kind:"partner",name:"Flashcard partners",text:g<=1?`Partners fold a paper into 6 boxes and draw one of the words in each box. Then they point and say the Arabic word to each other.`:`Partners fold a paper into 6 boxes. In each box they write one Arabic word in Arabic letters and draw a picture of it. Then they quiz each other: one points, the other says the word in Arabic.`},
     {minutes:gm,kind:"game",name:mv.name,text:mv.text},
     {minutes:rest-gm,kind:"wrap-up",name:"Say it to leave",text:`Each student says one of today's Arabic words and what it means in English before they line up or pack up.`}];
   return {title:(wk.length?"This week's Arabic words: ":"Arabic words ("+theme+"): ")+words.slice(0,3).map(w=>w.en).join(", "),objective:picked?"Students will "+String(O.text).replace(/^[A-Z]/,c=>c.toLowerCase()).replace(/\.$/,"")+", using six Arabic words.":"Students will say, read and use six Arabic words in context.",materials:["Whiteboard and markers","Paper","Pencil crayons"],steps:fixSteps(steps.filter(x=>x.minutes>0),n),game:{name:mv.name,howTo:mv.text},source:"local",subTip:"If the Arabic teacher left their own plan, use it instead. Tip: type your own Arabic lesson under \"Use my own lesson\" and it prints instead of this."}; }
@@ -2584,7 +2598,7 @@ function localLesson(b,p,change){ if(p&&p.code==="__custom"&&!String(p.custom||"
     const w=add((useHook&&chooseAct("hook",{...base,minutes:m.w,exclude:used}))||chooseAct("warmup",{...base,minutes:m.w,exclude:used}));
     const tf=add(chooseAct("teach",{...base,minutes:m.t,exclude:used}));
     let pr=add(chooseAct("practice",{...base,minutes:m.p,exclude:used}));
-    { const tl=(matchText||"").toLowerCase(); const ks=(pr&&pr.keywords)||[]; const spec=pr&&!(pr.subjects||[]).includes("any"); if(pr&&spec&&ks.length&&!ks.some(k=>k&&kwHit(tl,k))&&!sensitive&&o?.activity) pr=null; }
+    { const tl=(matchText||"").toLowerCase(); const GEN=/^(numbers?|patterns?|texts?|reading|writing|words?|measurement|estimat\w*|order|geometry|strateg\w*|shapes?|time|day|data|money|sequence|properties|comprehension|evidence|fiction|music|art|drawing|colou?rs?|health|science|ideas?|stor(y|ies))$/i; const ks=((pr&&pr.keywords)||[]).filter(k=>k&&!GEN.test(k)); const spec=pr&&!(pr.subjects||[]).includes("any"); const hits=ks.filter(k=>kwHit(tl,k)).length; if(pr&&!sensitive&&o?.activity&&(spec?hits<2:m.p<28)){ const others=picked.filter(a=>a!==pr).flatMap(a=>(a.materials||[]).map(cap)); (pr.materials||[]).map(cap).forEach(x=>{ if(!others.includes(x)) mats.delete(x); }); pr=null; } }
     const g1=hasGame?add(chooseAct("game",{...base,minutes:m.g,exclude:used})):null;
     const br=hasBreak?add(chooseAct("break",{...base,minutes:3,exclude:used})):null;
     const wr=add(chooseAct("wrap",{...base,minutes:m.wr,exclude:used}));
@@ -2594,12 +2608,12 @@ function localLesson(b,p,change){ if(p&&p.code==="__custom"&&!String(p.custom||"
       else steps.push({minutes:m.w,kind:"warm-up",name:w?.name||"Warm-up",text:`Use the attention signal. ${goal} `+(w?fillAct(w,topic,focusText):`Ask: "What do you already know about ${topic}?" Take 3 answers.`)}); }
     // teach
     let teachText="";
-    if(U) teachText+=gnum(grade)<=1?`Tell them today's big idea in simple words (show a picture or object if you can) and have them say it back to you. The idea: ${U.text.replace(/\.$/,"")}. `:`Write this big idea on the board and read it together: "${U.text.replace(/\.$/,"")}." Put it in kid words for them. `;
-    const kp=(K.length?K:(o?.focus||[]).map(f=>({text:f}))).slice(0,req.shorter?2:3);
-    if(kp.length) teachText+=`Teach these points one at a time, with an example for each: ${kp.map((k,i)=>`(${i+1}) ${k.text.replace(/\.$/,"")}`).join("; ")}. `;
-    if(tf) teachText+=fillAct(tf,topic,focusText);
+    if(U) teachText+=gnum(grade)<=1?`Tell them today's big idea in simple words (show a picture or object if you can) and have them say it back to you. The idea: ${U.text.replace(/\.$/,"")}. `:`Write this big idea on the board and read it together: "${U.text.replace(/\.$/,"")}." Ask: "Who can say that in their own words?" `;
+    const kp=(K.length?K:(o?.focus||[]).map(f=>({text:f}))).filter(k=>!/^Component \d/i.test(String(k.text))).slice(0,req.shorter?2:3);
+    if(kp.length) teachText+=`Read these points one at a time. After each one, ask 2 students for an example: ${kp.map((k,i)=>`(${i+1}) ${k.text.replace(/\.$/,"")}`).join("; ")}. `;
+    const tfUse=tf&&!(kp.length&&/___|board notes|Invent a/i.test(Array.isArray(tf.steps)?tf.steps.join(" "):String(tf.steps||""))); if(tfUse) teachText+=fillAct(tf,topic,focusText);
     if(p.notes) teachText+=` Use what the teacher left: ${p.notes}`;
-    steps.push({minutes:m.t,kind:"teach",name:tf?.name||"Mini-lesson",text:teachText.trim()||`Model one example about ${topic} on the board. Think out loud.`});
+    steps.push({minutes:m.t,kind:"teach",name:tfUse?tf.name:"Mini-lesson",text:teachText.trim()||`Model one example about ${topic} on the board. Think out loud.`});
     // practice: split into guided (outcome activity) + library when long enough
     const outcomeAct=!sensitive&&o?.activity?o.activity:"";
     if(outcomeAct&&pr&&m.p>=28){
@@ -2608,7 +2622,7 @@ function localLesson(b,p,change){ if(p&&p.code==="__custom"&&!String(p.custom||"
       if(hasBreak&&br){ steps.push({minutes:3,kind:"brain break",name:br.name,text:fillAct(br,topic,focusText)}); }
       steps.push({minutes:m.p-a,kind:pr.grouping==="partners"?"partner":"practice",name:pr.name,text:fillAct(pr,topic,focusText)+" Walk around and help. Pair weaker readers with a strong partner."});
     } else {
-      const act=pr?fillAct(pr,topic,focusText):(outcomeAct||"Students practise in pairs, then on their own in their notebooks.");
+      const act=pr?fillAct(pr,topic,focusText):outcomeAct?"Do the first one on the board while you think out loud. Do a second one together with the class. Then students do the rest on their own or with a partner: "+outcomeAct:"Students practise in pairs, then on their own in their notebooks.";
       steps.push({minutes:m.p,kind:pr?.grouping==="partners"||req.partner?"partner":"practice",name:pr?.name||"Practice",text:act+(outcomeAct&&pr?" Idea to connect it: "+outcomeAct:"")+" Walk around and help. Pair weaker readers with a strong partner."});
       if(hasBreak&&br) steps.push({minutes:3,kind:"brain break",name:br.name,text:fillAct(br,topic,focusText)});
     }
@@ -2677,7 +2691,7 @@ function localLesson(b,p,change){ if(p&&p.code==="__custom"&&!String(p.custom||"
   const k1=t=>String(t||"").replace(/\b(students|they) write (one|two|three|a|an) (short )?(sentences?|paragraphs?)\b/gi,"$1 draw a picture and tell a partner").replace(/\bwrite (two|three|one|a) (short )?sentences?\b/gi,"draw a picture and tell a partner").replace(/\b[Ss]tudents write\b(?! (a|the|each|their) (word|letter|name))/g,"Students draw").replace(/\bwrite it down\b/gi,"draw it").replace(/\bin their notebooks?\b/gi,"on paper");
   if(gnum(grade)<=1){ steps.forEach(x=>{ x.text=k1(x.text); }); support=k1(support); extend=k1(extend); }
   { const fx=fixSteps(steps,n); steps.length=0; fx.forEach(x=>steps.push(x)); }
-  return {title:fullTitle, objective:p.objective?p.objective:o?.text?"Students will "+kidify(sensitive?"talk about healthy choices and well-being":(selItem&&selItem.tag==="S"?selItem.text:o.text)).replace(/^./,c=>c.toLowerCase())+".":`Students will review ${topic}.`,
+  return {title:fullTitle, objective:p.objective?p.objective:o?.text?"Students will "+(!sensitive&&!(selItem&&selItem.tag==="S")&&!/^\s*(students|children)\b/i.test(String(o.text).replace(/^\s*[a-z][.)]\s+/i,""))?"learn that ":"")+kidify(sensitive?"talk about healthy choices and well-being":(selItem&&selItem.tag==="S"?selItem.text:o.text)).replace(/^./,c=>c.toLowerCase())+".":`Students will review ${topic}.`,
     materials:[...mats].slice(0,7), steps, game, board, support, extend:(tAct&&tAct.extend)||extend, early:EARLY[subj]||EARLY.general, check:["pe","music","art"].includes(subj)?(isSub()?"Put the equipment back where you found it. Leave me a note on how it went and who stood out.":"Note who needs more practice next time."):isSub()?"Collect the exit tickets and any practice work. Leave them on my desk with a note on how it went.":"Collect exit tickets and sort them into got it, almost, and not yet for tomorrow's groups.", subTip:tips.join(" "), source:"offline"};
 }
 /* offline worksheet */
@@ -2798,6 +2812,12 @@ function genShapes(r,g){ const out=[]; const used=new Set(); for(let i=0;i<4;i++
   out.push({q:g<=1?"How many sides does this shape have?":"Name this shape. How many sides and vertices does it have?",svg:svgWrap(100,100,`<polygon points="${pts}" fill="#D9C9F2" stroke="#111" stroke-width="2"/>`),answer:g<=1?`${n} sides`:`${name}, ${n} sides, ${n} vertices`,lines:1}); }
   if(g>=3) out.push({q:"Draw a shape with exactly one line of symmetry. Draw the line.",answer:"Answers will vary, for example an isosceles triangle.",lines:0,box:true});
   return out; }
+function genAlgebra(r,g,t){ const out=[]; const sym=g>=4?"n":"?";
+  if(g>=5&&/order of operations|bracket|numerical expression/.test(t)){ for(let i=0;i<2;i++){ const a=ri(r,2,9),b=ri(r,2,9),c=ri(r,2,6); out.push({q:`${a} + ${b} × ${c} = ____`,answer:`${a+b*c} (multiply first)`,lines:1}); out.push({q:`(${a} + ${b}) × ${c} = ____`,answer:`${(a+b)*c} (brackets first)`,lines:1}); } }
+  if(/equalit|balance|equal sign/.test(t)||(g<=4&&!out.length)){ const top=g<=2?9:20; for(let i=0;i<3;i++){ const a=ri(r,2,top),b=ri(r,2,top),d=ri(r,1,Math.min(a+b-1,top)); const ok=r()<0.5; const c=ok?a+b-d:a+b-d+ri(r,1,3); out.push({q:`True or false? ${a} + ${b} = ${c} + ${d}`,answer:ok?"true":`false (${a+b} is not ${c+d})`,lines:0}); } const a=ri(r,2,12),b=ri(r,2,12),c=ri(r,1,Math.min(a+b-1,12)); out.push({q:`${a} + ${b} = ${c} + ____`,answer:`${a+b-c}`,lines:0}); }
+  if(g>=5&&/expression|variable|term|coefficient/.test(t)&&!/order of operations/.test(t)){ const k=ri(r,2,12),m=ri(r,2,9),x=ri(r,2,10),a=ri(r,2,6),b=ri(r,1,9); out.push({q:`Write an expression for "${k} more than a number n".`,answer:`n + ${k}`,lines:1}); out.push({q:`Write an expression for "${m} times a number n".`,answer:`${m}n (or ${m} × n)`,lines:1}); out.push({q:`What is ${a}n + ${b} when n = ${x}?`,answer:`${a*x+b}`,lines:1}); out.push({q:`What is n − ${b} when n = ${x+b+3}?`,answer:`${x+3}`,lines:1}); }
+  if(/equation|unknown|solve|missing/.test(t)||!out.length){ const a=ri(r,2,9),x=ri(r,2,12),b=ri(r,3,g<=3?20:60),y=ri(r,2,g<=3?20:60); out.push({q:`Solve: ${sym} + ${b} = ${b+y}`,answer:`${sym} = ${y}`,lines:1}); out.push({q:`Solve: ${a} × ${sym} = ${a*x}`,answer:`${sym} = ${x}`,lines:1}); out.push({q:`Solve: ${sym} − ${a} = ${x}`,answer:`${sym} = ${x+a}`,lines:1}); }
+  return out.slice(0,8); }
 function genPatterns(r,g){ const out=[]; for(let i=0;i<4;i++){ const start=ri(r,1,g<=2?10:50), step=g<=1?ri(r,1,2):g<=3?ri(r,2,10):ri(r,3,25); const mult=g>=4&&i===3; const seq=[]; let v=start; for(let k=0;k<5;k++){ seq.push(v); v=mult?v*2:v+step; }
   out.push({q:`What comes next? ${seq.slice(0,4).join(", ")}, ____`,answer:`${seq[4]} (rule: ${mult?"multiply by 2":"add "+step})`,lines:0,fill:"Rule: ____________"}); }
   if(g>=3){ const a=ri(r,2,9), x=ri(r,2,12); out.push({q:`Solve: ${a} × n = ${a*x}`,answer:`n = ${x}`,lines:1}); const b=ri(r,5,40), y=ri(r,3,30); out.push({q:`Solve: n + ${b} = ${b+y}`,answer:`n = ${y}`,lines:1}); }
@@ -2842,10 +2862,10 @@ function mathPractice(o,p,r){
   else if((/^time/.test(unit)&&g>=1)||has(/\bclocks?\b|o'clock|\btell(ing)? time|elapsed time/)) gens.push(genTime);
   else if(/statistic|probabil|data/.test(unit)) gens.push(genData);
   else if(has(/symmetr/)) gens.push(genSymmetry);
-  else if(has(/3-d|three-dimensional|\b3d\b|cube|cone|cylinder|sphere|prism|pyramid|faces|edges/)) gens.push(gen3D);
+  else if(has(/3-d(?!igit)|three-dimensional|\b3d\b|cube|cone|cylinder|sphere|prism|pyramid|faces|edges/)) gens.push(gen3D);
   else if(/geometry/.test(unit)) gens.push(has(/symmetr|transform|translat|reflect|rotat/)&&g>=3?genShapes:genShapes);
   else if(/pattern/.test(unit)) gens.push(g<=1?genRepeat:genPatterns);
-  else if(/algebra/.test(unit)) gens.push(genPatterns);
+  else if(/algebra/.test(unit)) gens.push(/equalit|equation|expression|unknown|variable|order of operations|bracket|balance/.test(t)?((r,g)=>genAlgebra(r,g,t)):genPatterns);
   else if(/measurement/.test(unit)){ if((has(/area|perimeter|volume/)&&g>=3)) gens.push(genArea); else if(has(/angle/)) gens.push(genShapes); else if(g>=4) gens.push(genArea); else if(g>=1&&has(/\bclocks?\b/)) gens.push(genTime); else gens.push(genLength); }
   else if(/number/.test(unit)){
     if(has(/fraction|numerator|denominator|one-half|halves|\bhalf\b/)) gens.push(genFractions);
@@ -3135,7 +3155,7 @@ function parseTimetableOffline(text){
   lines.forEach(raw=>{
     let line=raw.trim(); if(!line) return;
     const dm=line.match(dayRe);
-    if(dm){ cur=dm[2]?DAYS[+dm[2]-1]:DAYS.find(d=>d.toLowerCase()===dm[1].toLowerCase().slice(0,3)); line=line.slice(dm[0].length).replace(/^[:\-\s]+/,""); if(!line) return; }
+    const d6=line.match(/^\s*day\s*([6-9]|1\d)\b/i); if(d6){ cur="__skip"; notes.push("Your timetable has more than 5 days. This planner uses Monday to Friday, so Day 6 and later were left out."); return; } if(cur==="__skip"&&!dm) return; if(dm){ cur=dm[2]?DAYS[+dm[2]-1]:DAYS.find(d=>d.toLowerCase()===dm[1].toLowerCase().slice(0,3)); line=line.slice(dm[0].length).replace(/^[:\-\s]+/,""); if(!line) return; }
     const rm=line.match(TT_RANGE);
     if(rm){
       const start=ttHour(rm[1],rm[2],rm[3]||rm[6]), end=ttHour(rm[4],rm[5],rm[6]);
@@ -3165,14 +3185,14 @@ function planText(d){
 const AI_URL="https://claude.ai/artifact/8caPqkybShrdMv7CcKG48m";
 const STANDALONE=!(window.claude&&window.claude.use);
 (function(){ if(!STANDALONE||!/^https?:$/.test(location.protocol)) return; const ib=document.getElementById("inst-btn"); if(!ib) return;
-  const installed=(window.matchMedia&&matchMedia("(display-mode: standalone)").matches)||navigator.standalone===true; if(installed) return;
   try{ if("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(()=>{}); }catch(e){}
+  const installed=(window.matchMedia&&matchMedia("(display-mode: standalone)").matches)||navigator.standalone===true; if(installed) return;
   let evt=null; addEventListener("beforeinstallprompt",e=>{ e.preventDefault(); evt=e; ib.hidden=false; });
   addEventListener("appinstalled",()=>{ ib.hidden=true; toast("Installed. Open it from your home screen."); });
   const ios=/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
   if(ios&&document.querySelector('link[rel="manifest"]')) ib.hidden=false;
   ib.onclick=async()=>{ if(evt){ evt.prompt(); try{ await evt.userChoice; }catch(e){} evt=null; ib.hidden=true; return; }
-    openModal("Put it on your home screen",`<div class="panel" style="gap:10px"><ol class="tourlist"><li>Tap the <b>Share</b> button <span aria-hidden="true">(the square with an arrow ⬆)</span> at the bottom or top of Safari.</li><li>Scroll down and tap <b>Add to Home Screen</b>.</li><li>Tap <b>Add</b>. Sub Planner now opens like an app.</li></ol><p class="small muted" style="margin:0">Your plans stay on this device, just like in the browser.</p></div>`); };
+    openModal("Put it on your home screen",`<div class="panel" style="gap:10px"><ol class="tourlist"><li>Tap the <b>Share</b> button <span aria-hidden="true">(the square with an arrow ⬆)</span> at the bottom or top of Safari.</li><li>Scroll down and tap <b>Add to Home Screen</b>.</li><li>Tap <b>Add</b>. Sub Planner now opens like an app.</li></ol><p class="small muted" style="margin:0">On iPhone and iPad the home screen app keeps its own copy, separate from Safari. Already set up here? Save a backup first (Settings, Backup), then load it in the app.</p></div>`); };
 })();
 async function offerFile(filename,data,type){
   if(STANDALONE){ const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([data],{type})); a.download=filename; document.body.append(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},1000); toast("Downloaded "+filename); return; }
@@ -3233,7 +3253,7 @@ setTimeout(()=>{ try{ renderSubChips(); }catch(e){} },0);
 
 /* ---------- My lessons ---------- */
 function renderLibrary(){
-  const L=S.library||[]; const box=$("#lib-list"); if(!box) return;
+  const L=S.library||[]; const box=$("#lib-list"); if(!box) return; { const lc=$("#lib-card"); if(lc) lc.hidden=!L.length; }
   box.innerHTML=L.length?`<div class="slist">${L.map((l,i)=>`<div class="librow ${subjClass(l.subject)}"><span class="chip"><span class="dot"></span>${esc(SUBJ[l.subject]?.short||"Lesson")}</span><span class="libname">${esc(l.name)}</span><span class="small muted">Gr ${esc(l.grade||"")}</span><button class="btn ghost danger" data-libdel="${i}">Remove</button></div>`).join("")}</div>`
     :`<div class="empty"><span style="font-size:22px">⭐</span><br>No saved lessons yet. On a finished plan, tap <b>⭐ Save for next time</b> on any lesson you like. It lands here, ready for any block.</div>`;
   box.querySelectorAll("[data-libdel]").forEach(bt=>twoTap(bt,"Tap again to remove",()=>{ S.library.splice(+bt.dataset.libdel,1); saveS(); renderLibrary(); }));
@@ -3490,7 +3510,7 @@ $("#wk-add").onclick=()=>openBlockEditor(curDate,null);
 
 /* ---------- settings ---------- */
 function openSettings(start){
-  const ov=openModal("Settings",`<div class="setnav" role="tablist">${[["colours","🎨 Subject colours"],["class","🏫 My class"],["options","🧩 Options"],["share","🤝 Share with staff"],["backup","💾 Backup"]].map(([k,l])=>`<button role="tab" data-st="${k}" aria-selected="false">${l}</button>`).join("")}</div><div id="set-body" class="panel" style="gap:12px;margin-top:12px"></div>`,{wide:true});
+  const ov=openModal("Settings",`<div class="setnav" role="tablist">${[["colours","🎨 Subject colours"],["class","🏫 My class"],["options","🧩 Options"],["share","🤝 Share with staff"]].map(([k,l])=>`<button role="tab" data-st="${k}" aria-selected="false">${l}</button>`).join("")}</div><div id="set-body" class="panel" style="gap:12px;margin-top:12px"></div>`,{wide:true});
   const fd=$("#fold-d"), fb=$("#fold-b"); const moved=[];
   const take=(src,sel)=>{ const kids=[...src.children].filter(x=>x.tagName!=="SUMMARY"); return kids; };
   const home=new Map(); [fd,fb].forEach(src=>{ if(src) take(src).forEach(x=>home.set(x,src)); });
@@ -3549,7 +3569,7 @@ async function receiveSetup(code){ let o; try{ o=await unpackSetup(code); }catch
     ${has("colors")?`<label class="check"><input type="checkbox" data-rs="colors"> <span><b>Their colours</b></span></label>`:""}
     <div class="row" style="gap:8px"><button class="btn primary" id="rs-go">Use these</button><button class="btn ghost" data-close>Not now</button></div></div>`);
   $("#rs-go",ov).onclick=()=>{ const on=k=>{ const x=ov.querySelector(`[data-rs="${k}"]`); return x&&x.checked; };
-    if(on("week")){ DAYS.forEach(d=>{ const prev=S.week[d]||[]; S.week[d]=sortBlocks((o.week[d]||[]).map(b=>{ const nb=blk(b.start,b.end,b.type,b.label,{subject:b.subject,who:b.who,mode:b.mode,duty:b.duty,notes:b.notes}); const same=prev.find(x=>x.start===b.start&&x.end===b.end); if(same) nb.id=same.id; return nb; })); }); S.example=false; }
+    if(on("week")){ const sw=sanitizeImport({settings:{week:o.week&&typeof o.week==="object"?o.week:{}}}).settings.week; DAYS.forEach(d=>{ const prev=S.week[d]||[]; S.week[d]=sortBlocks((sw[d]||[]).map(b=>{ const nb=blk(b.start,b.end,b.type,b.label,{subject:b.subject,who:b.who,mode:b.mode,duty:b.duty,notes:b.notes}); const same=prev.find(x=>x.start===b.start&&x.end===b.end); if(same) nb.id=same.id; return nb; })); }); S.example=false; }
     if(on("info")) ["office","firedrill","emergency","dismissal"].forEach(k=>{ if(o[k]) S[k]=o[k]; }); if(on("days")){ S.noSchool={...(S.noSchool&&!Array.isArray(S.noSchool)?S.noSchool:{}),...(o.noSchool&&!Array.isArray(o.noSchool)?o.noSchool:{})}; S.yesSchool=[...new Set([...(S.yesSchool||[]),...(o.yesSchool||[])])]; } if(on("colors")){ S.colors=o.colors||{}; S.labelColors=o.labelColors||{}; applyColors(); }
     saveS(); closeModal(); try{ history.replaceState(null,"",location.pathname+location.search); }catch(e){} renderAllViews(); toast("✓ Setup added. Check your timetable, then pick your subjects.",8000); }; }
 
@@ -3560,7 +3580,7 @@ function renderTodayCard(){ const el=$("#wk-today"); if(!el) return; if(S.exampl
   const d=smartDay(); const bl=(dayBlocks(d)||[]).filter(b=>b.type==="class"); if(!bl.length){ el.innerHTML=""; return; }
   const pl=P[d]; const ready=pl&&pl.generated&&bl.every(b=>pl.blocks?.[b.id]?.lesson); const printed=ready&&pl.printedAt;
   const tm=new Date(); tm.setDate(tm.getDate()+1); const nm=d===todayISO()?"Today":d===isoOf(tm)?"Tomorrow":DAYNAMES[dayKeyFor(d)]; const sd=new Date(d+"T12:00:00").toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"});
-  el.innerHTML=`<div class="todaycard ${ready?"ok":""}"><div><b>${esc(nm)} · ${esc(sd)}</b><span class="small">${printed?"🖨 Printed and ready":ready?"✓ Ready for a sub":"Not ready yet. One tap makes the whole day."}</span></div><div class="row" style="gap:6px;flex-direction:row">${ready?`<button class="btn" id="tc-board" title="Show the day on the classroom screen">📺 Board</button>`:""}<button class="btn ${ready?"":"primary"}" id="tc-go">${ready?"🖨 Print":"⚡ Make it ready"}</button></div></div>`; const tb=$("#tc-board"); if(tb) tb.onclick=()=>{ curDate=d; save("subplanner.date",d); openBoard(); };
+  el.innerHTML=`<div class="todaycard ${ready?"ok":""}"><div><b>${esc(nm)} · ${esc(sd)}</b><span class="small">${printed?"🖨 Printed and ready":ready?"✓ Ready for a sub":"Not ready yet. One tap makes the whole day."}</span></div><div class="row" style="gap:6px;flex-direction:row">${ready?`<button class="btn" id="tc-board" title="Show the day on the classroom screen">📺 Slides</button>`:""}<button class="btn ${ready?"":"primary"}" id="tc-go">${ready?"🖨 Print":"⚡ Make it ready"}</button></div></div>`; const tb=$("#tc-board"); if(tb) tb.onclick=()=>{ curDate=d; save("subplanner.date",d); openBoard(); };
   $("#tc-go").onclick=()=>{ curDate=d; save("subplanner.date",d); showTab("gen"); if(!ready) setTimeout(()=>{ try{ if(!planFor(d).generated&&!genRunning) genDay(); }catch(e){} },200); }; }
 
 
@@ -3589,8 +3609,8 @@ function openCoverage(){ const hit=coverageData(); const grades=[...new Set([S.g
 /* ---------- sub report: how did it go ---------- */
 function pendingReport(){ const td=todayISO(); for(let k=1;k<=7;k++){ const d=new Date(td+"T12:00:00"); d.setDate(d.getDate()-k); const iso=isoOf(d); const pl=P[iso]; if(pl&&pl.printedAt&&pl.generated&&!pl.reportDone&&isSub()) return iso; } return null; }
 function renderReportCard(){ const el=$("#wk-report"); if(!el) return; const d=pendingReport(); if(!d||window.__rpLater===d){ el.innerHTML=""; return; }
-  el.innerHTML=`<div class="todaycard rep"><div><b>📝 How did ${esc(DAYNAMES[dayKeyFor(d)])} go?</b><span class="small muted">Copy in the sub's notes. Unfinished lessons can move to your next day.</span></div><div class="row" style="gap:6px"><button class="btn primary" id="rp-go">Fill in</button><button class="btn ghost" id="rp-x">Not now</button><button class="btn ghost" id="rp-skip">Skip this day</button></div></div>`;
-  $("#rp-go").onclick=()=>openReport(d); $("#rp-x").onclick=()=>{ window.__rpLater=d; renderReportCard(); }; $("#rp-skip").onclick=()=>{ planFor(d).reportDone=Date.now(); saveP(); renderReportCard(); }; }
+  el.innerHTML=`<div class="todaycard rep"><div><b>📝 How did ${esc(DAYNAMES[dayKeyFor(d)])} go?</b><span class="small muted">Copy in the sub's notes. Unfinished lessons can move to your next day.</span></div><div class="row" style="gap:6px;flex-direction:row"><button class="btn primary" id="rp-go">Fill in</button><button class="btn ghost" id="rp-skip">No thanks</button></div></div>`;
+  $("#rp-go").onclick=()=>openReport(d); $("#rp-skip").onclick=()=>{ planFor(d).reportDone=Date.now(); saveP(); renderReportCard(); }; }
 function openReport(d){ const pl=planFor(d); const cb=(dayBlocks(d)||[]).filter(b=>b.type==="class"&&pl.blocks?.[b.id]?.lesson); pl.report=pl.report||{};
   const ov=openModal(`How did ${DAYNAMES[dayKeyFor(d)]} go?`,`<div class="panel" style="gap:12px"><div class="row" style="justify-content:space-between;gap:8px;flex-wrap:wrap"><p class="small muted" style="margin:0">Tap what the sub ticked beside each lesson.</p><button type="button" class="btn ghost" id="rp-all">✓ Everything got done</button></div>
     ${cb.map(b=>{ const x=pl.blocks[b.id]; const v=pl.report[b.id]||""; return `<div class="rp-row" data-b="${b.id}"><div><b>${esc(t12(b.start))} <span class="rp-subj ${subjClass(x.subject)||""}">${esc(SUBJ[x.subject]?.short||showLabel(b))}</span> ${esc(x.lesson.title||"")}</b></div><div class="seg rp-seg" role="group" aria-label="${esc((SUBJ[x.subject]?.short||"")+" "+(x.lesson.title||""))}">${[["done","✓ Done"],["partly","½ Partly"],["skipped","✕ Skipped"]].map(([k,l])=>`<button data-v="${k}" aria-pressed="${v===k}">${l}</button>`).join("")}</div></div>`; }).join("")}
@@ -3779,7 +3799,7 @@ function openExport(scope,eo={}){
   const inner=()=>week?weekPrintInner():only?wsAll(d,{only,lv:onlyLv}):what==="ws"?`<div style="max-width:920px;margin:0 auto;display:flex;flex-direction:column;gap:24px">${wsAll(d,{cover:true})}</div>`:`${sheetHTML(d,true)}${what==="plan"?"":`<div style="max-width:920px;margin:24px auto 0;display:flex;flex-direction:column;gap:24px">${wsAll(d,{cover:true})}</div>`}`;
   const fname=ext=>`${week?"week-plan":only?"worksheet":what==="ws"?"worksheets":what==="plan"?"plan":"plan-and-worksheets"}-${nm}.${ext}`;
   $("#ex-html",ov).onclick=()=>{ offerFile(fname("html"),exportHTMLDoc("Plan "+nm,inner()),"text/html"); };
-  const pr=$("#ex-print",ov); if(pr) pr.onclick=()=>{ closeModal(); if(week||only||what==="ws"){ const w=window.open("","_blank"); if(w){ w.document.write(exportHTMLDoc("Plan "+nm,inner())); w.document.close(); setTimeout(()=>w.print(),600); } } else { document.body.classList.toggle("pr-plan",what==="plan"); document.body.classList.toggle("pr-ws",what==="ws"); document.body.classList.toggle("pr-both",what!=="plan"&&what!=="ws"); window.print(); setTimeout(()=>document.body.classList.remove("pr-plan","pr-ws","pr-both"),1500); } };
+  const pr=$("#ex-print",ov); if(pr) pr.onclick=()=>{ closeModal(); if(week||only||what==="ws"){ const w=window.open("","_blank"); if(w){ w.document.write(exportHTMLDoc("Plan "+nm,inner())); w.document.close(); setTimeout(()=>w.print(),600); } else toast("Your browser blocked the print window. Allow pop-ups for this page, or use Save as PDF.",9000); } else { document.body.classList.toggle("pr-plan",what==="plan"); document.body.classList.toggle("pr-ws",what==="ws"); document.body.classList.toggle("pr-both",what!=="plan"&&what!=="ws"); window.print(); setTimeout(()=>document.body.classList.remove("pr-plan","pr-ws","pr-both"),1500); } };
   $("#ex-pdf",ov).onclick=async()=>{ st.innerHTML=`<span class="spin" style="display:inline-block;vertical-align:-3px"></span> Making your PDF...`;
     try{ const blob=await makePDF(inner(),(i,n)=>{ if(n>1) st.innerHTML=`<span class="spin" style="display:inline-block;vertical-align:-3px"></span> Making your PDF... part ${i} of ${n}`; }); st.textContent=""; offerFile(fname("pdf"),blob,"application/pdf"); }
     catch(e){ console.warn("pdf fail",e&&e.message,e&&e.stack); const ios=/iPhone|iPad|iPod/.test(navigator.userAgent); st.textContent=STANDALONE?(ios?"Couldn't make the PDF on this device. Tap Print now, then the Share button, then Save to Files.":"Couldn't make the PDF on this device. Tap Print now and choose Save as PDF."):"Couldn't make the PDF. Try the web page, then print it to PDF."; st.className="status err"; st.scrollIntoView({block:"center",behavior:"smooth"}); toast("Couldn't make the PDF. Use Print now instead.",5000); } };
@@ -3865,14 +3885,16 @@ function docxDay(d){
   const band=t=>table([[cell(para([[t,{b:true,color:"FFFFFF",sz:26}]]),{w:9360,fill:"1F66C1"})]],[9360]);
   const rowOf=b=>{ const when=para([[`${t12(b.start)}`,{b:true}]])+para([[`to ${t12(b.end)}`,{}]])+para([[`${dur(b)} min`,{color:"586777",sz:18}]]);
     if(b.type!=="class"){ let note=b.type==="lunch"?(isSub()?"Your break. No lunch supervision.":"Lunch."):b.type==="prep"?`Prep${b.who?": "+b.who:""}.${isSub()?" This is your break.":""}`:(b.type==="recess"||b.type==="duty")?(isDuty(b)?`${isSub()?"You are on supervision":"Supervision"}: ${b.duty}.`:(isSub()?"No supervision. This is your break.":"No duty.")):(b.who||"")+(b.mode?" · "+b.mode:"");
-      return [cell(when,{w:1700,fill:isDuty(b)?"FFF3C4":"EEF2F6"}),cell(para([[b.label,{b:true,sz:24}]])+(note?para(note):"")+(b.notes?para(b.notes):""),{w:7660})]; }
+      const un=s=>s.replace(/<[^>]+>/g,"").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&amp;/g,"&"); let ls=[]; try{ ls=[...otherBlock(b).matchAll(/<li>([\s\S]*?)<\/li>/g)].map(m=>un(m[1])).filter(Boolean); }catch(e){ ls=[note,b.notes].filter(Boolean); }
+      return [cell(when,{w:1700,fill:isDuty(b)?"FFF3C4":"EEF2F6"}),cell(para([[b.label,{b:true,sz:24}]])+ls.map(l=>para(/^(Pick them up|A different group|You are on supervision)/.test(l)?[[l,{b:true,color:"C62828"}]]:l)).join(""),{w:7660})]; }
     const p=bp(plan,b), L=p.lesson, o=p.code&&p.code!=="__custom"?findOutcome(p.grade,p.subject,p.code):(p.code!=="__custom"&&p.subject?(()=>{ const sv=curDate; try{ curDate=d; const x=ctx(b,p).o; return x&&x.code?x:null; }catch(e){ return null; } finally{ curDate=sv; } })():null); const col=(h=>{ const n=[0,2,4].map(i=>parseInt(h.slice(i,i+2),16)/255).map(c=>c<=.03928?c/12.92:Math.pow((c+.055)/1.055,2.4)); const L=.2126*n[0]+.7152*n[1]+.0722*n[2]; if(L<=.18) return h; const k=Math.sqrt(.18/L); return [0,2,4].map(i=>Math.round(parseInt(h.slice(i,i+2),16)*k).toString(16).padStart(2,"0")).join("").toUpperCase(); })((/^#[0-9a-f]{6}$/i.test((S.colors||{})[p.subject]||"")?S.colors[p.subject].slice(1).toUpperCase():"")||HEX[p.subject]||"1F5FBF");
     let c=para([[`${SUBJ[p.subject]?.name||"Class"}${o?" · "+o.code:""}`,{b:true,color:col,sz:20}]]);
     if(!L){ c+=para([[p.objective||(o?o.text:"")||"Open block",{b:true,sz:26}]]); if(p.activity) c+=para([["Activity: ",{b:true}],[p.activity,{}]]); if(p.notes) c+=para([["Notes: ",{b:true}],[p.notes,{}]]); }
     else { c+=para([[L.title,{b:true,sz:28}]]); if(L.objective) c+=para([[L.objective,{i:true}]]); if(o) c+=para([["Outcome: ",{b:true}],[o.text,{}]]);
       if(L.materials?.length) c+=para([["You need: ",{b:true}],[L.materials.join(", "),{}]]);
       (p.res||[]).forEach(x=>{ c+=para([[x.t==="link"?"Link: ":"File: ",{b:true}],[x.name+(x.t==="link"?"  "+x.url:"")+(x.where?"  ("+x.where+")":""),{}]]); });
-      let t=mins(b.start); L.steps.forEach((st,k)=>{ c+=para([[`${k+1}. ${t12(hhmm(t),false)} · ${+st.minutes||0} min  `,{b:true,color:col}],[(st.name?st.name+": ":""),{b:true}],[st.text,{}]],{ind:200}); if(st.look) c+=para([["Look for: ",{i:true,color:"586777"}],[st.look,{i:true,color:"586777"}]],{ind:400}); t+=+st.minutes||0; });
+      let wi=-1; if(S.wsOn&&p.worksheet&&!/mine/.test(L.source||"")){ L.steps.forEach((st,i)=>{ if(/practice/.test(st.kind||"")&&!/station|choice/i.test(st.name||"")) wi=i; }); if(wi<0) L.steps.forEach((st,i)=>{ if(/game|teach/.test(st.kind||"")&&wi<0&&i>0) wi=i; }); }
+      let t=mins(b.start); L.steps.forEach((st0,k)=>{ const st=k===wi?{...st0,name:"Worksheet time",text:`Hand out "${p.worksheet.title}${S.levels?" ● ■ ▲":""}" from the Worksheets pages.${S.levels?" Give everyone ■. Use ● for anyone who can't read the first question. Early finishers get ▲.":""} Read the instructions together. Collect what they did, finished or not.`,look:""}:st0; c+=para([[`${k+1}. ${t12(hhmm(t),false)} · ${+st.minutes||0} min  `,{b:true,color:col}],[(st.name?st.name+": ":""),{b:true}],[st.text,{}]],{ind:200,...(k===wi?{shade:"FFF7D6"}:{})}); if(st.look) c+=para([["Look for: ",{i:true,color:"586777"}],[st.look,{i:true,color:"586777"}]],{ind:400}); t+=+st.minutes||0; });
       if(L.board) c+=para([["Choice board: ",{b:true}],[L.board.join(" | "),{}]]);
       if(L.game&&!(L.steps||[]).some(x=>x.name===L.game.name)) c+=para([[`Game: ${L.game.name}. `,{b:true}],[L.game.howTo,{}]],{shade:"FDE7DC"});
       [["Support",L.support],["Challenge",L.extend],["Done early",L.early],[isSub()?"Leave for me":"Collect",L.check],["Tip",L.subTip],["Teacher note",p.notes]].filter(z=>z[1]).forEach(([k,v])=>c+=para([[k+": ",{b:true}],[v,{}]])); }
@@ -3889,6 +3911,7 @@ function docxDay(d){
     [["What we finished",2],["What we didn't get to",2],["Students who were absent",1],["Students who were really helpful",1],["Anything I should know",3],["Your name",1]].forEach(([q,n])=>{ x+=para([[q,{b:true}]],{before:140}); x+=lines(n); });
     if(incl("thanks")){ x+=para([[`Thank you${plan.subName?", "+plan.subName:""}!`,{b:true,sz:36}]],{align:"center",before:240,shade:"DDF2F3"}); x+=para("I really appreciate you taking care of my class today. You made my day easier.",{align:"center",shade:"DDF2F3"}); x+=para([[S.teacher||"",{i:true,b:true}]],{align:"center",shade:"DDF2F3"}); } }
   else { x+=H("Reflection",26); x+=lines(5); }
+  if(isSub()&&incl("attendance")) attendGroups().forEach(gp=>{ x+=pageBreak+H(`Attendance${gp.name?": "+gp.name:""}, ${prettyDate(d)}`,26)+para([["Tick who is here. Confidential: return to the office.",{i:true}]])+table([[cell(para([["Name",{b:true}]]),{w:5760,fill:"EEF2F6"}),...["Here","Away","Late"].map(h=>cell(para([[h,{b:true}]]),{w:1200,fill:"EEF2F6"}))],...gp.names.map(n=>[cell(para(n),{w:5760}),cell(para(" "),{w:1200}),cell(para(" "),{w:1200}),cell(para(" "),{w:1200})])],[5760,1200,1200,1200]); });
   // worksheets
   if(DOCX_WHAT==="plan"||!S.wsOn) return x;
   if(DOCX_WHAT==="ws") x="";
@@ -3952,7 +3975,7 @@ async function makeDOCX(days){
 function showChooser(){
   if(document.getElementById("chooser")) return;
   const d=document.createElement("div"); d.className="chooser"; d.id="chooser";
-  d.innerHTML=`<div class="box"><div><div class="eyebrow">Welcome</div><h1>Sub Day Planner</h1><p class="muted" style="margin-top:6px">Alberta K to 6 sub plans and lesson plans. Pick how you want to use it. You can switch any time.</p></div>
+  d.innerHTML=`<div class="box"><div><div class="eyebrow">Welcome</div><h1>Sub Day Planner</h1><p class="muted" style="margin-top:6px">Alberta K to 6 sub plans and lesson plans. Pick how you want to use it. You can switch any time.</p>${/#setup=/.test(location.hash)?`<p class="notice" style="margin-top:10px"><b>A colleague sent you their school setup.</b> Tap <b>Start here</b> under Standard to add it.</p>`:""}</div>
     <div class="opts">
       <a class="opt" href="${AI_URL}" target="_blank" rel="noopener" id="ch-ai"><span class="req">Claude account required</span><h3>AI version</h3><ul><li>Writes every lesson and worksheet fresh</li><li>Follows any request word for word</li><li>Reads timetable photos and PDFs</li><li>Opens in Claude, uses your own Claude plan</li></ul><span class="btn big" style="margin-top:10px;justify-content:center">Open AI version ↗</span></a>
       <button class="opt" id="ch-std"><span class="req free">Free, no account</span><h3>Standard version</h3><ul><li>Works right here, no internet needed after it loads</li><li>Builds lessons from ${ACTS.length.toLocaleString()} activities and the curriculum</li><li>Worksheets with reading passages and math pictures</li><li>Nothing to sign up for</li></ul><span class="btn primary big" style="margin-top:10px;justify-content:center">Start here →</span></button>
