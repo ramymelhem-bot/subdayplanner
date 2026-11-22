@@ -1573,7 +1573,7 @@ function blockFormHTML(b,p){
         <label class="f">My activity idea <span class="hint">Optional. We build the lesson around it.</span><input data-k="activity" value="${esc(p.activity)}" placeholder="Class debate: river or coast?"></label>
         <p class="small muted" style="margin:6px 0 0"><b>Or write the whole lesson</b> the way you'd tell a colleague. We turn it into timed steps for the sub and keep your activities and minutes.</p>
         <label class="f"><span class="sr-only">My lesson</span><textarea data-k="mine" maxlength="4000" style="min-height:150px" placeholder="Start with a quick review of yesterday's water vs air demo. Then fill a syringe with air and one with water and let kids try pushing. Partners write what they notice. Class share: why can air squish but water can't? Exit slip: one sentence explaining compressibility.">${esc(p.mine||"")}</textarea></label>
-        <div data-minecheck class="minecheck small" aria-live="polite"><span class="muted">Tip: add minutes if you know them, like "demo (10 min)".</span></div>
+        <div data-minecheck class="minecheck small" aria-live="polite"><span class="muted">Tip: add minutes if you know them, like "demo (10 min)".</span></div>${SR?"":`<p class="notice small" style="margin:6px 0 0;font-weight:600">${dictateHint()}</p>`}
       </div></details>
       <details class="sect res" ${(p.res||[]).length?"open":""}><summary>📎 <b>Links and files</b> <span class="small muted">${(p.res||[]).length?`(${(p.res||[]).length} added)`:"(slides, PDFs, notes for this lesson)"}</span></summary><div class="inner" style="display:flex;flex-direction:column;gap:8px" data-res></div></details>
       <details class="sect more" ${STANDALONE&&p.request&&!/Emergency sub day/.test(p.request)?"open":""}><summary>More options <span class="small muted">(style, stations, theme day, materials)</span></summary><div class="inner" style="display:flex;flex-direction:column">${STANDALONE?`<label class="f vision">✨ <b>Your vision for this lesson</b> <span class="small muted">(optional)</span><span class="hint">${STANDALONE?"A style or idea to shape it: a mystery, a game show, an epic mission, a competition, role-play, outside, calm, more partner work.":"Describe the lesson you dream of: a style, a theme, a teacher you admire, what to add or leave out. Claude builds the lesson around it."}</span><textarea data-k="request" rows="2" placeholder="${STANDALONE?"Make it a detective mystery with lots of movement.":"Make it an epic mystery the kids talk about all week, with lots of movement, the way Ron Clark would teach it."}">${esc(p.request)}</textarea></label>`:""}
@@ -1879,7 +1879,7 @@ ${p.format==="stations"?"LESSON STYLE: station rotation. After a short warm-up a
 ${p.objective?"TEACHER'S OBJECTIVE (use it): "+p.objective:""}
 ${p.activity?"TEACHER'S ACTIVITY IDEA (build the main activity around it): "+p.activity:""}
 ${p.parts>1?`LESSON SEQUENCE: this is part ${p.part} of ${p.parts} on this outcome. ${p.part>1?"Open with a short recap of the previous part and build on it. Do not repeat it.":"Introduce the topic. Later parts will build on it."}`:""}
-${MINE?`TEACHER'S OWN LESSON (THIS IS THE LESSON. Keep the teacher's activities, order and ideas. Do not add new activities, games, hooks or brain breaks they did not mention, and do not replace anything. Your job is only to organize it into clear timed steps for a sub: split it into steps, give each a short name and minutes that add up to the block, write what to do and say in plain words, keep the teacher's minutes exactly where they give them and only time the untimed steps, add short transitions and a brief wrap-up if they did not include one. If something is unclear, make the simplest reasonable choice and keep it short.):\n"""${scrubNames(p.mine)}"""`:""}
+${MINE?`TEACHER'S OWN LESSON (THIS IS THE LESSON. Keep the teacher's activities, order and ideas. Do not add new activities, games, hooks or brain breaks they did not mention, and do not replace anything. Your job is only to organize it into clear timed steps for a sub: split it into steps, give each a short name and minutes that add up to the block, write what to do and say in plain words, keep the teacher's minutes exactly where they give them and only time the untimed steps, add short transitions and a brief wrap-up if they did not include one. If something is unclear, make the simplest reasonable choice and keep it short. The teacher may have dictated this by voice: drop filler words (um, uh, like, you know, yeah, okay so), false starts and repeats, and write every step as clear, professional instructions for a substitute, keeping their meaning.):\n"""${scrubNames(p.mine)}"""`:""}
 ${resPromptText(p)}
 TEACHER NOTES AND MATERIALS LEFT: ${scrubNames(p.notes)||"none"}
 ${p.noprep&&!String(p.mine||"").trim()?"NO-PREP LESSON: the sub has ONLY a whiteboard, a marker, paper and pencils. No printing, no devices, no books, no other materials. Every step is at most 2 short sentences a substitute can follow cold.\n":""}TEACHER'S VISION AND REQUESTS (build the whole lesson around this and follow it exactly; it overrides the rules below. If they name a teacher or person, capture that person's teaching style and energy without quoting them or claiming they made it): ${scrubNames(p.request)||"none"}
@@ -2475,7 +2475,7 @@ function fixSteps(steps,n,noCap){ steps=(steps||[]).filter(Boolean); if(!steps.l
   const CAPW={hook:30,"warm-up":32,"brain break":24,game:45,"wrap-up":28}; const wc=x=>String(x).split(/\s+/).filter(Boolean).length;
   out.forEach(st=>{ if(noCap||st.mine||!st.text) return; const t=String(st.text); const lim=st.kind==="brain break"?CAPW["brain break"]:/practice|partner/.test(st.kind)?(/Idea to connect it/.test(t)?80:0):(st.look||/Question ideas|Words to use|Facts to listen for|Use these|Goal on the board|Exit question/.test(t))?CAPW[st.kind]:(st.minutes<=5?45:0); if(!lim) return; if(wc(t)<=lim) return; const ss=[]; t.split(/(?<=[.!?]["”]?)\s+(?=[A-Z"“(])/).forEach(x=>{ const pv=ss.length?ss[ss.length-1]:null; if(pv!==null&&(pv.match(/["“”]/g)||[]).length%2) ss[ss.length-1]=pv+" "+x; else ss.push(x); }); const one=/wrap-up|hook/.test(st.kind); if(ss.length<=(one?1:2)) return; const KEY=/^Then:|Goal on the board|Today we are learning|Exit question|answers?\b|Question ideas|Words to use|Facts to listen for|Idea to connect it|Weaker readers|Anyone stuck/i; const k0=one&&(st.kind==="wrap-up"||wc(ss[0])>=12)?1:2; const keep=ss.slice(0,k0); let i=k0; while(i<ss.length&&!KEY.test(ss[i])&&wc(keep.join(" ")+" "+ss[i])<=lim) keep.push(ss[i++]); ss.slice(i).forEach(x=>{ if(KEY.test(x)) keep.push(x); }); st.text=keep.join(" "); });
   return out; }
-function mineClean(txt){ let L=String(txt||"").replace(/\r/g,"").split("\n");
+function mineClean(txt){ if(SPEECHY.test(String(txt||""))) txt=tidySpeech(txt); let L=String(txt||"").replace(/\r/g,"").split("\n");
   const junk=/^\s*(thanks|thank you|cheers|best|regards|sincerely|hi|hello|hey|good morning|dear)\b[\s\S]{0,40}$|^\s*sent from my|^\s*[-–—_]{2,}\s*$|^\s*(—|-)\s*\w+\s*$/i;
   L=L.filter(l=>!junk.test(l.trim()));
   const out=[]; L.forEach(l=>{ if(/^\s+[◦○▪\-*•]\s+|^\s{2,}\S/.test(l)&&out.length){ out[out.length-1]+=" "+l.trim().replace(/^[◦○▪\-*•]\s*/,""); } else out.push(l); });
@@ -2503,7 +2503,7 @@ function mineSteps(txt,minutes){ const {parts,mats}=mineSplit(txt); const MIN=/\
   const un=steps.filter(x=>!x.given); let rest=Math.max(0,minutes-given); const wsum=un.reduce((a,x)=>a+(W[x.kind]||2),0);
   un.forEach(x=>{ x.minutes=wsum?Math.max(2,Math.min(CAP[x.kind]||15,Math.round(rest*(W[x.kind]||2)/wsum))):2; });
   return {steps,mats,given,total:steps.reduce((a,x)=>a+x.minutes,0)}; }
-function mineLesson(b,p){ const {o,minutes}=ctx(b,p); const M=mineSteps(p.mine,minutes); const steps=M.steps; if(!steps.length) return null;
+function mineLesson(b,p){ const {o,minutes}=ctx(b,p); const M=mineSteps(p.mine,minutes); const steps=M.steps; if(!steps.length) return null; steps.forEach(st=>{ if(!String(st.text||"").trim()) st.text=String(st.name||"").replace(/^./,c=>c.toUpperCase())+"."; });
   let tot=steps.reduce((a,x)=>a+x.minutes,0); let tip="This is the teacher's own lesson. Follow the steps in order.";
   if(tot<minutes){ let spare=minutes-tot; const un=steps.filter(x=>!x.given); const fill=Math.min(10,spare); const give=spare-fill;
     if(give>0){ const core=un.filter(x=>!/warm-up|wrap-up/.test(x.kind)); const tgt=core.length?core:un.length?un:[steps.slice().sort((x,y)=>y.minutes-x.minutes)[0]]; tgt.forEach((x,i)=>{ x.minutes+=Math.floor(give/tgt.length)+(i<give%tgt.length?1:0); }); }
@@ -3441,8 +3441,37 @@ document.querySelectorAll("[data-pal]").forEach(b=>b.onclick=()=>{ const pl=PALS
 applyColors(); renderColors();
 
 /* ---------- voice typing + sorter ---------- */
-const MIC_SEL='#tab-setup textarea:not(#s-classlist), #d-note, #d-script, #vb-text, [data-k="mine"], [data-k="activity"], [data-k="objective"], [data-k="notes"], [data-k="request"], [data-custom]';
+const MIC_SEL='#tab-setup textarea:not(#s-classlist):not(#st-arw), #d-note, #d-script, #vb-text, #s-office, #rp-note, #be-notes, #be-fixed, [data-f="fixedActivity"], [data-chg], .res-where, [data-k="mine"], [data-k="activity"], [data-k="objective"], [data-k="notes"], [data-k="request"], [data-custom]';
 function policyAllows(f){ try{ const pp=document.permissionsPolicy||document.featurePolicy; if(pp&&pp.allowsFeature) return pp.allowsFeature(f); }catch(e){} return !(window.self!==window.top&&!!(window.claude&&window.claude.use)); }
+
+/* ---------- tidy dictated speech ---------- */
+const SPEECHY=/\b(u+m+|u+h+|erm|hmm+|you know|i mean|kind of|sort of|gonna|wanna|gotta|kinda|yeah|okay so|ok so|alright so|so yeah)\b/i;
+function tidySpeech(t){ let x=String(t||""); if(!x.trim()) return x;
+  const R=(a,b)=>{ x=x.replace(a,b); };
+  R(/\b(u+m+|u+h+|e+r+m*|a+h+|hmm+|mm+)\b[,.]?\s*/gi,"");
+  R(/,?\s*\b(you know|i mean|basically|literally|actually)\b,?/gi,"");
+  R(/\b(kind of|sort of|kinda|sorta)\s+/gi,"");
+  R(/\blike\s+(a|an|one|two|three|four|five|ten|\d+)\b(?=\s+(minutes?|mins?|seconds?|hours?|times?|pages?|questions?))/gi,"about $1");
+  R(/\b(to|first|then|just|and|so|but|or|they|we|you|I|it's|it is|was)\s+like,?\s+/gi,"$1 "); R(/(^|[.!?]\s+)like,?\s+/gi,"$1"); R(/,\s*like,\s*/gi,", ");
+  R(/\b(so yeah|yeah|yep|yup|right\?)\b[,.]?\s*/gi,"");
+  R(/\b(okay|ok|alright|all right) so\b,?\s*/gi,"");
+  for(let k=0;k<3;k++) R(/(^|[.!?]\s+|\n)\s*(and so|so|okay|ok|alright|all right|well|anyway|and)\b,?\s+/gim,"$1");
+  R(/\bgonna\b/gi,"going to"); R(/\bwanna\b/gi,"want to"); R(/\bgotta\b/gi,"have to");
+  R(/\b(i want you to|i'd like you to|i would like you to|can you please|can you|could you|you're going to|you are going to|you'll want to|you will|you'll|you can|please)\s+/gi,"");
+  R(/\b(have|get|let) (the kids|my kids|the class|the students|them)\s+(to\s+)?/gi,"have students ");
+  R(/\b(the kids|my kids|the guys|you guys)\b/gi,"students"); R(/\bkids\b/gi,"students");
+  R(/\s*,?\s*\b(and then|then after that|after that|and after that|once that'?s done|when they'?re done|so then|and next|then next)\b,?\s*/gi,". Then ");
+  R(/([a-z'])\s+then\s+/g,"$1. Then ");
+  R(/\b(\w+)(\s+\1\b)+/gi,"$1"); R(/(\.\s*Then\s*)+/g,". Then "); R(/\bThen\s+then\b/gi,"Then");
+  R(/[ \t]+([,.!?])/g,"$1"); R(/([,.!?]){2,}/g,"$1"); R(/,\s*\./g,"."); R(/[ \t]{2,}/g," ");
+  R(/^\s*[.,]\s*/gm,""); R(/\bi\b/g,"I");
+  x=x.replace(/(^|[.!?]\s+|\n\s*)([a-z])/g,(m,a,c,off)=>{ const before=x.slice(Math.max(0,off-3),off+a.length); return /\b[A-Z]\.\s+$/.test(before)?m:a+c.toUpperCase(); });
+  x=x.split("\n").map(l=>{ l=l.trim(); if(!l) return l; return /[.!?:)]$/.test(l)||l.length<4?l:l+"."; }).join("\n");
+  return x.trim(); }
+document.addEventListener("change",e=>{ const f=e.target; if(!f||!f.matches||!f.matches("textarea, input[type=text], input:not([type])")) return; if(!f.matches(MIC_SEL)) return; const v=f.value; if(!SPEECHY.test(v)) return; const t=tidySpeech(v); if(t===v||!t) return;
+  f.value=t; f.dispatchEvent(new Event("input",{bubbles:true})); toast("Tidied what you said: removed the ums and filler words.",9000,{label:"↶ Undo",fn:()=>{ f.value=v; f.dispatchEvent(new Event("input",{bubbles:true})); toast("Put back"); }}); },true);
+
+function dictateHint(){ const ua=navigator.userAgent; const touch=window.matchMedia&&matchMedia("(pointer:coarse)").matches; if(touch||/iphone|ipad|android/i.test(ua)) return "🎤 To talk instead of type, tap the microphone on your keyboard."; if(/mac/i.test(navigator.platform||ua)) return "🎤 To talk instead of type, click in the box and press the Fn (🌐) key twice."; return "🎤 To talk instead of type, click in the box and press the Windows key + H."; }
 const SR=(window.SpeechRecognition||window.webkitSpeechRecognition)&&policyAllows("microphone")?(window.SpeechRecognition||window.webkitSpeechRecognition):null; let micRec=null, micBtn=null;
 function stopMic(){ try{ micRec&&micRec.stop(); }catch(e){} }
 function startMic(field,btn){ if(micRec){ const same=micBtn===btn; stopMic(); if(same) return; }
@@ -3457,7 +3486,7 @@ function startMic(field,btn){ if(micRec){ const same=micBtn===btn; stopMic(); if
   rec.onend=()=>{ clearTimeout(noSound); field.removeEventListener("input",typed); btn.classList.remove("on"); btn.setAttribute("aria-pressed","false"); btn.innerHTML="🎤"; if(micRec===rec){ micRec=null; micBtn=null; } field.dispatchEvent(new Event("change",{bubbles:true})); };
   try{ rec.start(); }catch(e){ toast("Couldn't start the microphone. Use the 🎤 on your keyboard.",6000); return; }
   micRec=rec; micBtn=btn; btn.classList.add("on"); btn.setAttribute("aria-pressed","true"); btn.innerHTML="■ Starting…"; }
-function addMics(root){ if(!SR) return; (root||document).querySelectorAll(MIC_SEL).forEach(f=>{ if(f.dataset.micOn) return; f.dataset.micOn="1"; const b=document.createElement("button"); b.type="button"; b.className="micbtn"; b.innerHTML="🎤"; const lab=(f.labels&&f.labels[0]?f.labels[0].textContent:f.getAttribute("aria-label")||f.placeholder||"").replace(/\s+/g," ").trim().split(/[.?(]/)[0].slice(0,40); b.setAttribute("aria-label","Speak into "+(lab||"this box")); b.setAttribute("aria-pressed","false"); b.onclick=e=>{ e.preventDefault(); e.stopPropagation(); startMic(f,b); };
+function addMics(root){ if(!SR){ const vb=document.getElementById("vb-text"); if(vb&&!vb.dataset.hint){ vb.dataset.hint="1"; const p=document.createElement("p"); p.className="small"; p.style.cssText="margin:6px 0 0;font-weight:600"; p.textContent=dictateHint(); vb.after(p); } return; } (root||document).querySelectorAll(MIC_SEL).forEach(f=>{ if(f.dataset.micOn) return; f.dataset.micOn="1"; const b=document.createElement("button"); b.type="button"; b.className="micbtn"; b.innerHTML="🎤"; const lab=(f.labels&&f.labels[0]?f.labels[0].textContent:f.getAttribute("aria-label")||f.placeholder||"").replace(/\s+/g," ").trim().split(/[.?(]/)[0].slice(0,40); b.setAttribute("aria-label","Speak into "+(lab||"this box")); b.setAttribute("aria-pressed","false"); b.onclick=e=>{ e.preventDefault(); e.stopPropagation(); startMic(f,b); };
   const w=document.createElement("span"); w.className="micwrap"+(f.tagName==="TEXTAREA"?" ta":""); f.parentNode.insertBefore(w,f); w.append(f,b); }); }
 let micQ=false; new MutationObserver(ms=>{ if(micQ||document.querySelector(".pdfhost")) return; if(!ms.some(m=>[...m.addedNodes].some(n=>n.nodeType===1&&(n.matches?.(MIC_SEL)||n.querySelector?.(MIC_SEL))))) return; micQ=true; requestAnimationFrame(()=>{ micQ=false; addMics(); }); }).observe(document.body,{childList:true,subtree:true}); addMics();
 const SORT_FIELDS=[["rules","Class rules"],["students","Students to Watch"],["helpers","Best Helpers"],["firedrill","Fire Drill and Attendance Booklet"],["important","Important"],["general","General notes"],["routines","How the day runs"],["layout","Room layout and groups"],["behaviour","Attention signal and behaviour"],["medical","Medical and safety"],["materials","Where things are"],["emergency","Emergency"],["dismissal","Dismissal"],["office","Office"]];
@@ -3503,16 +3532,23 @@ async function aiSort(t){ const sample=await samplePromise; if(!sample) return n
 if(!(window.matchMedia&&matchMedia("(pointer:coarse)").matches)){ document.body.classList.add("mouse"); const fixTap=root=>{ const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT); const ns=[]; while(w.nextNode()) ns.push(w.currentNode); ns.forEach(n=>{ if(/\bTap\b|\btap\b/.test(n.nodeValue)&&!n.parentElement.closest("#p-sheet,.ws,textarea,script,style")) n.nodeValue=n.nodeValue.replace(/\bTap\b/g,"Click").replace(/\btap\b/g,"click"); }); }; fixTap(document.body); new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{ if(n.nodeType===1) fixTap(n); else if(n.nodeType===3&&n.parentElement) fixTap(n.parentElement); }))).observe(document.body,{childList:true,subtree:true}); }
 const PRIVATE_KEYS=["classlist","students","helpers","medical","behaviour","important","general","firedrill","dismissal","emergency","layout","rules","routines","ttImage"];
 const FREE_URL="https://ramymelhem-bot.github.io/subdayplanner/";
-async function signInGate(){ if(STANDALONE||!window.claude?.use) return; let ok=false;
-  try{ const user=await window.claude.use("user"); if(user){ const id=await user.id().catch(()=>null); ok=!!id; } if(!ok){ const sm=await samplePromise; if(sm) ok=true; } }catch(e){ try{ ok=!!(await samplePromise); }catch(e2){ ok=false; } }
-  if(ok) return;
+async function isSignedIn(){ try{ const user=await Promise.race([window.claude.use("user"),new Promise(r=>setTimeout(()=>r(null),6000))]); if(user){ const id=await Promise.race([user.id().catch(()=>null),new Promise(r=>setTimeout(()=>r(null),6000))]); if(id) return true; } }catch(e){}
+  try{ if(await Promise.race([samplePromise,new Promise(r=>setTimeout(()=>r(null),4000))])) return true; }catch(e){} return false; }
+async function signInGate(){ if(STANDALONE||!window.claude?.use) return;
+  for(let k=0;k<4;k++){ if(await isSignedIn()) return; await new Promise(r=>setTimeout(r,1500)); }
   const g=document.createElement("div"); g.id="signgate"; g.setAttribute("role","dialog"); g.setAttribute("aria-modal","true"); g.setAttribute("aria-labelledby","sg-t");
   g.innerHTML=`<div class="sg-card"><div class="sg-ic" aria-hidden="true">🔒</div><h2 id="sg-t">Sign in to Claude first</h2><p>This is the <b>AI version</b> of Sub Day Planner. It writes your lessons and worksheets, reads photos of your timetable, and saves your work to your Claude account. You need to be signed in to Claude to use it.</p>
-    <ol class="sg-steps"><li>Click <b>Sign in to Claude</b>. It opens in a new tab.</li><li>Sign in, then come back here.</li><li>Click <b>I'm signed in</b>.</li></ol>
+    <ol class="sg-steps"><li>Click <b>Sign in to Claude</b>. It opens in a new tab.</li><li>Sign in, then come back to this tab.</li><li>This page notices by itself. If it doesn't within a few seconds, click <b>I'm signed in</b>.</li></ol>
     <div class="sg-btns"><a class="btn primary big" href="https://claude.ai/login" target="_blank" rel="noopener">Sign in to Claude</a><button class="btn big" id="sg-reload">I'm signed in</button></div>
+    <p class="small muted" id="sg-st" aria-live="polite" style="margin:10px 0 0"></p>
     <p class="small muted" style="margin:14px 0 0">No Claude account? Use the <a href="${FREE_URL}" target="_blank" rel="noopener">free version</a> instead. It works without signing in.</p></div>`;
   document.body.append(g); const w=document.querySelector(".wrap"); if(w) w.setAttribute("inert","");
-  g.querySelector("#sg-reload").onclick=()=>{ try{ location.reload(); }catch(e){} };
+  let done=false, busy=false; const pass=()=>{ if(done) return; done=true; g.remove(); if(w) w.removeAttribute("inert"); toast("You're signed in. Welcome!"); try{ startSync(); }catch(e){} };
+  const check=async(n)=>{ if(busy||done) return false; busy=true; try{ for(let k=0;k<n;k++){ if(await isSignedIn()){ pass(); return true; } if(k<n-1) await new Promise(r=>setTimeout(r,1200)); } }finally{ busy=false; } return false; };
+  const iv=setInterval(()=>{ if(done) return clearInterval(iv); if(document.visibilityState==="visible") check(1); },4000);
+  document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible") check(2); }); addEventListener("focus",()=>check(2));
+  g.querySelector("#sg-reload").onclick=async()=>{ const b=g.querySelector("#sg-reload"), st=g.querySelector("#sg-st"); b.disabled=true; b.textContent="Checking..."; st.textContent="Checking your Claude sign-in. This can take a few seconds.";
+    if(await check(4)) return; st.textContent="Still not signed in here. Reloading the page to try again..."; setTimeout(()=>{ try{ location.reload(); }catch(e){} },1200); };
   setTimeout(()=>{ const a=g.querySelector("a.btn"); if(a) a.focus(); },50); }
 async function startSync(){
   if(STANDALONE||!window.claude?.use) return;
@@ -3966,7 +4002,7 @@ async function makePDF0(inner,onProg){
 const xe=s=>String(s??"").replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g,"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 const HEX={arabic:"6D4C41",ela:"C0392B",math:"2C6BD6",science:"1F7A47",social:"9A5F00",pe:"B8461A",health:"B23A6C",art:"7A3FC0",music:"0F7480"};
 function tint(hex,a=.85){ const n=parseInt(hex,16); const c=[n>>16&255,n>>8&255,n&255].map(v=>Math.round(v+(255-v)*a)); return c.map(v=>v.toString(16).padStart(2,"0")).join("").toUpperCase(); }
-function run(t,o={}){ const rtl=/[؀-ۿ]/.test(t); return `<w:r><w:rPr>${o.b?"<w:b/>":""}${o.i?"<w:i/>":""}${o.color?`<w:color w:val="${o.color}"/>`:""}${o.sz?`<w:sz w:val="${o.sz}"/><w:szCs w:val="${o.sz}"/>`:""}${rtl?"<w:rtl/>":""}</w:rPr><w:t xml:space="preserve">${xe(t)}</w:t></w:r>`; }
+function run(t,o={}){ const rtl=/[\u0600-\u06FF]/.test(t); return `<w:r><w:rPr>${o.b?"<w:b/>":""}${o.i?"<w:i/>":""}${o.color?`<w:color w:val="${o.color}"/>`:""}${o.sz?`<w:sz w:val="${o.sz}"/><w:szCs w:val="${o.sz}"/>`:""}${rtl?"<w:rtl/>":""}</w:rPr><w:t xml:space="preserve">${xe(t)}</w:t></w:r>`; }
 function para(parts,o={}){ if(typeof parts==="string") parts=[[parts,{}]]; return `<w:p><w:pPr>${o.shade?`<w:shd w:val="clear" w:color="auto" w:fill="${o.shade}"/>`:""}${o.align?`<w:jc w:val="${o.align}"/>`:""}<w:spacing w:before="${o.before??60}" w:after="${o.after??60}"/>${o.ind?`<w:ind w:left="${o.ind}"/>`:""}${o.line?`<w:pBdr><w:bottom w:val="single" w:sz="4" w:space="1" w:color="9AA5B1"/></w:pBdr>`:""}</w:pPr>${parts.map(([t,ro])=>run(t,{...(o.r||{}),...ro})).join("")}</w:p>`; }
 const H=(t,sz=32,color="14202C")=>para([[t,{b:true,sz,color}]],{before:200,after:80});
 const lines=n=>Array.from({length:n}).map(()=>para(" ",{line:true,before:120,after:0})).join("");
