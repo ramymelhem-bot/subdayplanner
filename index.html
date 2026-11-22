@@ -1989,7 +1989,7 @@ function renderGen(){ const gw=$("#g-ws"), gl=$("#g-levels"), gs=$("#g-short"); 
   $("#s-arabic").onchange=e=>{ S.arabic=e.target.checked; saveS(); }; $("#s-iarabic").onchange=e=>{ S.iTeachArabic=e.target.checked; if(S.iTeachArabic){ let n=0; DAYS.forEach(d=>(S.week[d]||[]).forEach(b=>{ if(/arabic/i.test(b.label||"")&&b.type!=="class"){ b.type="class"; b.subject="arabic"; b.who=""; b.mode=""; n++; } })); if(n) toast(`Made ${n} Arabic block${n>1?"s":""} your lessons.`); } saveS(); }; })();
 document.addEventListener("click",e=>{ const m=e.target.closest("[data-makeplan]"); if(!m) return; const g=$("#g-go"); if(!g) return; if(g.disabled){ toast("Already writing. Hang on."); return; } g.scrollIntoView({block:"center",behavior:"smooth"}); g.click(); });
 let genPromise=null;
-async function genDay(all){ if(genRunning){ await genPromise; if(!all) return genDayInner(false); } genRunning=true; genPromise=(async()=>{ try{ await genDayInner(all); } finally { genRunning=false; } })(); return genPromise; }
+async function genDay(all){ try{ tidyAllSpoken(curDate); }catch(e){} if(genRunning){ await genPromise; if(!all) return genDayInner(false); } genRunning=true; genPromise=(async()=>{ try{ await genDayInner(all); } finally { genRunning=false; } })(); return genPromise; }
 async function genDayInner(all){
   const plan=planFor(curDate), cbAll=classBlocks(); const btn=$("#g-go"), st=$("#g-status");
   const wantWS=!!S.wsOn;
@@ -2063,18 +2063,18 @@ function sheetHTML(date,exporting){ FOOT_SEEN=new Set();
   const blocks=dayBlocks(date)||[], plan=planFor(date); if(!blocks.length) return "";
   const sub=isSub(); const who=[S.teacher,S.room?"Room "+S.room:""].filter(Boolean).map(esc).join(", "); const title=(sub?"Substitute Plan":"Lesson Plan")+(who?": "+who:"");
   const meta=[S.grade?`Grade ${esc(S.grade)}`:"",`Date: <b>${esc(prettyDate(date))}</b>`,S.layout?esc(bul(S.layout)[0]):""].filter(Boolean).join(" &nbsp;|&nbsp; ");
-  let h=`<article class="pdoc force-light"><header class="pd-head"><h1>${title}</h1><p class="pd-meta">${meta}</p>${plan.dayNote?`<p class="red"><b>${esc(plan.dayNote)}</b></p>`:""}${S.example?`<p class="pd-sample">⚠ SAMPLE TIMES: these times are an example, not this class's real timetable. Check with the office.</p>`:""}</header>`;
+  let h=`<article class="pdoc force-light"><header class="pd-head"><h1>${title}</h1><p class="pd-meta">${meta}</p>${plan.dayNote?`<p class="red"><b>${esc(spk(plan.dayNote))}</b></p>`:""}${S.example?`<p class="pd-sample">⚠ SAMPLE TIMES: these times are an example, not this class's real timetable. Check with the office.</p>`:""}</header>`;
   if(sub&&incl("welcome")) h+=`<section class="pd-c pd-blue"><h3>Hi ${esc(plan.subName||"there")}, welcome to ${S.room?"Room "+esc(S.room):"our class"}!</h3><p>Thank you so much for covering my class today. I really appreciate it. Everything you need is in this plan, step by step. Have a great day with my students!</p><p class="sig">${esc(S.teacher||"")}</p></section>`;
   if(sub){ const bb=[["Medical and safety",S.medical,"medical"],["Where things are",S.materials,"materials"],["Emergency",S.emergency,"emergency"]].filter(x=>x[1]&&incl(x[2]));
     const nWS=S.wsOn?blocks.filter(b=>b.type==="class"&&bp(plan,b).worksheet).length:0; const kids=attendGroups().reduce((a,g)=>a+g.names.length,0);
     const glance=blocks.map(b=>{ const p=plan.blocks[b.id]; const what=b.type==="class"&&p?.subject?nameFor(b,p,true):showLabel(b,p); const W=esc(b.who||b.label||"Other teacher"), GS=attendGroups(); const note=isDuty(b)?`<b>Your duty: ${esc(b.duty)}</b>`:(b.type==="duty"||b.type==="recess")&&b.duty?"No duty, break":b.type==="specialist"||b.type==="prep"?(b.mode===SPEC_MODES[0]?`Walk them to ${W}. <b>Pick up ${t12(b.end,false)}</b>`:b.mode===SPEC_MODES[1]?`${W}. You stay and help`:b.mode===SPEC_MODES[2]?`${W} comes to our room`:b.mode===SPEC_MODES[3]||b.prep?`Drop off at ${W}. Your break. <b>Pick up ${t12(b.end,false)}</b>`:/takes/i.test(b.who||"")?esc(b.who):W+" takes them"):b.type==="lunch"?(GS.length>1&&/^(PM|Afternoon)\b/i.test(GS[1].name||"")?`Break. <b>${esc(GS[1].name)} group after lunch</b>`:"Break"):b.type==="recess"?"Break":""; return `<tr><td>${t12(b.start,false)}</td><td>${esc(what)}</td><td>${note}</td></tr>`; }).join("");
     const entry=blocks.find(b=>b.type==="entry"||/entry|arriv|bell|door/i.test(b.label||""))||blocks[0];
     const first=entry?`<p><b>First:</b> ${t12(entry.start,false)}, ${esc(showLabel(entry))}${entry.notes?`. ${esc(entry.notes)}`:""}</p>`:"";
-    const today=plan.dayNote&&plan.dayNote!=="Emergency sub plan"&&!/^Emergency plan:/.test(plan.dayNote)?`<p><b>Today only:</b> ${esc(plan.dayNote)}</p>`:"";
+    const today=plan.dayNote&&plan.dayNote!=="Emergency sub plan"&&!/^Emergency plan:/.test(plan.dayNote)?`<p><b>Today only:</b> ${esc(spk(plan.dayNote))}</p>`:"";
     h+=`<section class="pd-c pd-yellow"><h3>Before the Bell</h3>${first}${today}${bb.map(([t,v])=>`<p><b>${t}:</b> ${liLines(v).replace(/^<p>|<\/p>$/g,"")}</p>`).join("")}${nWS?`<p><b>Worksheets:</b> ${nWS} worksheet${nWS>1?"s are":" is"} in the Worksheets packet. Each lesson tells you when to hand them out.</p>`:""}<table class="pd-glance pd-rb" style="margin-bottom:8px"><tr><th colspan="2">Room basics</th></tr>${roomBasics().map(([k,v])=>`<tr><td><b>${k}</b></td><td>${esc(v)}</td></tr>`).join("")}</table><table class="pd-glance"><tr><th>Time</th><th>What</th><th>Note</th></tr>${glance}</table></section>`; }
   if(sub){ const rules=bul(S.rules); if(rules.length||S.score) h+=`<section class="pd-c pd-purple"><h3>Class Rules for Today</h3><ul>${rules.map(x=>x.startsWith("!")?`<li class="red">${esc(x.slice(1).trim())}</li>`:`<li>${esc(x)}</li>`).join("")}${S.score?`<li><b>Behaviour score:</b> after every lesson, write the class's score out of 10 on the board so they can track it. At the end of each class, reveal the final score and explain how you got that number.</li>`:""}</ul></section>`;
     INCLUDE.filter(([k])=>k!=="rules"&&!["medical","materials","dismissal","emergency"].includes(k)&&incl(k)&&S[k]).forEach(([k,hd])=>{ const tone=k==="firedrill"||k==="emergency"||k==="medical"?"pd-yellow":k==="students"||k==="helpers"?"pd-purple":"pd-grey"; h+=`<section class="pd-c ${tone}"><h3>${hd==="Students to know about"?"Students to Watch":hd}</h3>${liLines(S[k])}</section>`; }); }
-  if(sub&&plan.script) h+=`<section class="pd-c pd-red"><h3>Say This First</h3><div class="pd-script">${bul(plan.script).map(x=>`<p>${esc(x)}</p>`).join("")}</div><p class="small">Remind them of this again if things start to slip.</p></section>`;
+  if(sub&&plan.script) h+=`<section class="pd-c pd-red"><h3>Say This First</h3><div class="pd-script">${bul(spk(plan.script)).map(x=>`<p>${esc(x)}</p>`).join("")}</div><p class="small">Remind them of this again if things start to slip.</p></section>`;
   if(S.jq){ const jq=pickJQ(date); if(jq) h+=`<section class="pd-c pd-blue"><h3>Joke and Quote of the Day</h3><p>Write both on the board. Read each one aloud, then talk about it. About 5 minutes.</p>
     <div class="pd-box"><h4>Joke of the Day</h4><p class="big">${esc(jq.joke.text)}</p><p><b>Ask:</b> ${esc(jq.joke.ask)}</p><p><b>Meaning for you:</b> ${esc(jq.joke.meaning)}</p></div>
     <div class="pd-box"><h4>Quote of the Day</h4><p class="big">"${esc(jq.quote.text)}" ${esc(jq.quote.who)}</p><p><b>Ask:</b> ${esc(jq.quote.ask)}</p><p><b>Meaning for you:</b> ${esc(jq.quote.meaning)}</p></div>${scoreChip()}</section>`; }
@@ -3461,7 +3461,12 @@ const MIC_SEL='#tab-setup textarea:not(#s-classlist):not(#st-arw), #d-note, #d-s
 function policyAllows(f){ try{ const pp=document.permissionsPolicy||document.featurePolicy; if(pp&&pp.allowsFeature) return pp.allowsFeature(f); }catch(e){} return !(window.self!==window.top&&!!(window.claude&&window.claude.use)); }
 
 /* ---------- tidy dictated speech ---------- */
-const SPEECHY=/\b(u+m+|u+h+|erm|hmm+|you know|i mean|kind of|sort of|gonna|wanna|gotta|kinda|yeah|okay so|ok so|alright so|so yeah)\b/i;
+const SPEECHY=/\b(u+m+|u+h+|erm|hmm+|you know|i mean|kind of|sort of|gonna|wanna|gotta|kinda|yeah|okay so|ok so|alright so|so yeah|stuff like that|or something|and and|the the)\b/i;
+const spk=t=>t&&SPEECHY.test(t)?tidySpeech(t):t;
+const SPOKEN_S=["office","rules","helpers","firedrill","general","routines","behaviour","medical","emergency","materials","dismissal","students","layout","important"];
+function tidyAllSpoken(date){ let n=0; const fix=(o,k)=>{ const v=o&&o[k]; if(typeof v!=="string"||!SPEECHY.test(v)) return; const t=tidySpeech(v); if(t&&t!==v){ o[k]=t; n++; } };
+  SPOKEN_S.forEach(k=>fix(S,k)); const pl=P[date]; if(pl){ fix(pl,"dayNote"); fix(pl,"script"); Object.values(pl.blocks||{}).forEach(x=>["objective","activity","notes","request","custom","fixedActivity"].forEach(k=>fix(x,k))); }
+  if(n){ saveS(); saveP(); ["d-note","d-script"].forEach(id=>{ const e=document.getElementById(id); if(e&&document.activeElement!==e) e.value=id==="d-note"?(pl?.dayNote||""):(pl?.script||""); }); } return n; }
 function tidySpeech(t){ let x=String(t||""); if(!x.trim()) return x;
   const R=(a,b)=>{ x=x.replace(a,b); };
   R(/\b(u+m+|u+h+|e+r+m*|a+h+|hmm+|mm+)\b[,.]?\s*/gi,"");
@@ -3478,14 +3483,28 @@ function tidySpeech(t){ let x=String(t||""); if(!x.trim()) return x;
   R(/\b(the kids|my kids|the guys|you guys)\b/gi,"students"); R(/\bkids\b/gi,"students");
   R(/\s*,?\s*\b(and then|then after that|after that|and after that|once that'?s done|when they'?re done|so then|and next|then next)\b,?\s*/gi,". Then ");
   R(/([a-z'])\s+then\s+/g,"$1. Then ");
+  R(/,?\s*\b(and stuff like that|stuff like that|things like that|and stuff|or something like that|or something|or whatever|and whatnot|and all that)\b/gi,"");
+  for(let k=0;k<3;k++) R(/\b(\w+\s+\w+)\s+(?:\w+\s+){0,2}?\1\b/gi,(m,a)=>/\b(the|a|to|of|and|in|on|for|with|it|is)\s+(the|a|to|of|and|in|on|for|with|it|is)\b/i.test(a)&&m.split(/\s+/).length>5?m:a);
+  R(/\b(\w+)(\s+\1\b)+/gi,"$1");
+  R(/(\s+(and|or|but|so))?\s+\b(maybe)\s+(have|tell|ask|do|try|give|show|read|let)\b/gi,". Maybe $4");
+  R(/\b(?!to\b|and\b|or\b|then\b|please\b|can\b|will\b|should\b|must\b|also\b|just\b|maybe\b|Maybe\b)([a-z]+)\s+(tell|ask|remind) (them|students|the class)\b/g,"$1. $2 $3");
+  R(/\blike for\s+(\d+)/gi,"for about $1");
+  R(/([a-z])\s+(it's|they're|there's|it is)\s/g,(m,a,b)=>a+". "+b[0].toUpperCase()+b.slice(1)+" ");
+  R(/([a-z])\s+(it|they|there|we)\s+(will|is|are|can|should|must|need|needs|has|have)\b/g,"$1. $2 $3");
+  R(/\b(Once|When|After|As soon as) ([a-z' ]{2,30}?) (done|finished|ready|back|inside|outside) (?=[a-z])/g,"$1 $2 $3, ");
+  R(/([a-z,'])\s+(Once|After|When|Before|If|It|They|There|This|That|We|Then|Please|Make|Have|Take|Line|Bring|Remind|Ask|Tell|Give)\b/g,"$1. $2");
   R(/\b(\w+)(\s+\1\b)+/gi,"$1"); R(/(\.\s*Then\s*)+/g,". Then "); R(/\bThen\s+then\b/gi,"Then");
   R(/[ \t]+([,.!?])/g,"$1"); R(/([,.!?]){2,}/g,"$1"); R(/,\s*\./g,"."); R(/[ \t]{2,}/g," ");
   R(/^\s*[.,]\s*/gm,""); R(/\bi\b/g,"I");
   x=x.replace(/(^|[.!?]\s+|\n\s*)([a-z])/g,(m,a,c,off)=>{ const before=x.slice(Math.max(0,off-3),off+a.length); return /\b[A-Z]\.\s+$/.test(before)?m:a+c.toUpperCase(); });
   x=x.split("\n").map(l=>{ l=l.trim(); if(!l) return l; return /[.!?:)]$/.test(l)||l.length<4?l:l+"."; }).join("\n");
+  x=x.replace(/(^|[.!?]\s+)(Tell|Ask|Remind) (them|students)\.(\s|$)/g,"$1").replace(/\s+(and|or|but)\.(\s|$)/g,".$2").trim();
   return x.trim(); }
-document.addEventListener("change",e=>{ const f=e.target; if(!f||!f.matches||!f.matches("textarea, input[type=text], input:not([type])")) return; if(!f.matches(MIC_SEL)) return; const v=f.value; if(!SPEECHY.test(v)) return; const t=tidySpeech(v); if(t===v||!t) return;
-  f.value=t; f.dispatchEvent(new Event("input",{bubbles:true})); toast("Tidied what you said: removed the ums and filler words.",9000,{label:"↶ Undo",fn:()=>{ f.value=v; f.dispatchEvent(new Event("input",{bubbles:true})); toast("Put back"); }}); },true);
+document.addEventListener("focusin",e=>{ const f=e.target; if(f&&f.matches&&f.matches(MIC_SEL)) f._v0=f.value; },true);
+document.addEventListener("focusout",e=>{ const f=e.target; if(!f||!f.matches||!f.matches("textarea, input[type=text], input:not([type])")) return; if(!f.matches(MIC_SEL)) return; const v=f.value; if(f._v0===v) return; f._v0=v; if(!SPEECHY.test(v)) return; const t=tidySpeech(v); if(t===v||!t) return;
+  f.value=t; f.dispatchEvent(new Event("input",{bubbles:true})); toast("Tidied what you said: removed the ums and filler words.",9000,{label:"↶ Undo",fn:()=>{ f.value=v; f.dispatchEvent(new Event("input",{bubbles:true})); toast("Put back"); }});
+  if(!STANDALONE&&!aiBlocked&&v.length>50) aiPolish(v).then(r=>{ if(r&&f.value===t){ f.value=r; f.dispatchEvent(new Event("input",{bubbles:true})); toast("Claude polished what you said.",9000,{label:"↶ Undo",fn:()=>{ f.value=v; f.dispatchEvent(new Event("input",{bubbles:true})); toast("Put back"); }}); } }).catch(()=>{}); },true);
+async function aiPolish(v){ const sample=await samplePromise; if(!sample) return ""; const r=await sample("A teacher dictated this note for a substitute teacher by voice. Rewrite it as clear, professional writing for the substitute: remove filler words (um, uh, like, yeah, you know, okay so), false starts and repeats, fix punctuation and capitals, and split it into short sentences. Keep every fact, time, place and instruction, keep their meaning, and add nothing new. Write directly to the substitute. Return only the rewritten text, no quotes or preamble.\n\nDICTATED:\n\"\"\""+v.slice(0,3000)+"\"\"\"",{modelTier:"default"}); const out=String(r&&r.text||"").trim().replace(/^["“]|["”]$/g,""); return out&&out.length<v.length*1.6+80?out:""; }
 
 function dictateHint(){ const ua=navigator.userAgent; const touch=window.matchMedia&&matchMedia("(pointer:coarse)").matches; if(touch||/iphone|ipad|android/i.test(ua)) return "🎤 To talk instead of type, tap the microphone on your keyboard."; if(/mac/i.test(navigator.platform||ua)) return "🎤 To talk instead of type, click in the box and press the Fn (🌐) key twice."; return "🎤 To talk instead of type, click in the box and press the Windows key + H."; }
 const SR=(window.SpeechRecognition||window.webkitSpeechRecognition)&&policyAllows("microphone")?(window.SpeechRecognition||window.webkitSpeechRecognition):null; let micRec=null, micBtn=null;
@@ -3924,7 +3943,7 @@ $("#p-pack").onclick=()=>offerFile(`sub-folder-${(S.teacher||"class").replace(/\
 /* ---------- export: PDF, Word (Google Docs), web page ---------- */
 function exportHTMLDoc(title,inner){ const css=document.getElementById("app-css").textContent+(document.getElementById("custom-colors")?.textContent||""), fonts=document.getElementById("app-fonts").outerHTML;
   return `<!doctype html><html data-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)}</title>${fonts}<style>${css} body{padding:24px} .sheet{max-width:920px;margin:0 auto} @media print{body{padding:0}}</style></head><body>${inner}</body></html>`; }
-function openExport(scope,eo={}){
+function openExport(scope,eo={}){ try{ tidyAllSpoken(curDate); }catch(e){}
   const week=scope==="week"; const d=curDate; const only=eo.only||null; const onlyLv=eo.lv??""; let nm=week?`week of ${weekDates(d)[0]}`:d;
   const hasWS=!week&&!!wsAll(d); let what=eo.what||"all";
   const ttl=week?"Print the week":only?"Print one worksheet":what==="ws"?"Print worksheets":what==="plan"?"Print plan":hasWS?"Print plan and worksheets":"Print plan";
@@ -3976,7 +3995,7 @@ window.addEventListener("beforeprint",()=>{ try{ const pl=planFor(curDate); if(p
 window.addEventListener("afterprint",()=>{ setTimeout(()=>{ try{ const pl=planFor(curDate); if(!pl.generated) return; let d=new Date(curDate+"T12:00:00"), nx=null; for(let i=0;i<10;i++){ d.setDate(d.getDate()+1); const iso=isoOf(d); if(d.getDay()%6&&!holidayOf(iso)&&(dayBlocks(iso)||[]).length){ const p2=P[iso]; if(!(p2&&p2.generated)){ nx=iso; break; } } }
     const dn=DAYNAMES[dayKeyFor(curDate)]; toast(`🎉 Printed. You're set for ${dn}.`+(nx?"":" The rest of the week is ready too."),12000,nx?{label:`Plan ${DAYNAMES[dayKeyFor(nx)]} →`,fn:()=>{ curDate=nx; save("subplanner.date",nx); showTab("gen"); setTimeout(()=>{ if(!planFor(nx).generated&&!genRunning) genDay(); },200); }}:undefined); }catch(e){} },400); });
 window.addEventListener("afterprint",()=>{ if(document.body.classList.contains("pr-auto")) document.body.classList.remove("pr-plan","pr-ws","pr-auto"); });
-$("#p-download").onclick=()=>{ openExport("day",{what:"all"}); const xp=document.querySelector("#mdl #ex-print"); if(xp&&STANDALONE&&!S.example) xp.click(); };
+$("#p-download").onclick=()=>{ try{ tidyAllSpoken(curDate); }catch(e){} openExport("day",{what:"all"}); const xp=document.querySelector("#mdl #ex-print"); if(xp&&STANDALONE&&!S.example) xp.click(); };
 $("#p-other").onclick=()=>openExport("day",{what:"all"}); if(!STANDALONE) $("#p-other").hidden=true;
 $("#g-see").onclick=()=>{ $("#p-sheet").classList.toggle("closed"); renderGen(); if(!$("#p-sheet").classList.contains("closed")) $("#g-seewrap").scrollIntoView({behavior:"smooth",block:"start"}); };
 $("#p-wsdl").onclick=()=>openExport("day",{what:"ws"});
