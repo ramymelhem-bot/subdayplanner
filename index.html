@@ -3310,6 +3310,17 @@ const STANDALONE=!(window.claude&&window.claude.use);
   const help=()=>openModal("Install Sub Planner as an app",`<div class="panel" style="gap:10px"><ol class="tourlist">${steps().map(x=>`<li>${x}</li>`).join("")}</ol><p class="small muted" style="margin:0">${ios?(S.example?"Do this before you start, so your work lives in the app.":"The app keeps its own copy of your work. Save a backup here first (☰ Menu, Save or open a backup), then open it in the app."):"Your plans come with you. It works offline after that."}${ios||android?"":" On a school-managed computer, IT may have turned installing off."}</p><button class="btn primary" data-close>Got it</button></div>`);
   window.__installApp=async()=>{ evt=evt||window.__bip; if(evt){ try{ evt.prompt(); const r=await evt.userChoice; if(r&&r.outcome==="accepted"){ ib.hidden=true; } }catch(e){ help(); } evt=null; window.__bip=null; return; } help(); };
   ib.onclick=window.__installApp;
+  const LS=k=>{ try{ return localStorage.getItem(k); }catch(e){ return null; } }, LW=(k,v)=>{ try{ localStorage.setItem(k,v); }catch(e){} };
+  const nag=()=>{ if(LS("sdp-inst-never")||+(LS("sdp-inst-snooze")||0)>Date.now()||document.getElementById("inst-nag")) return; if(firefox&&!android) return;
+    const o=document.createElement("div"); o.id="inst-nag"; o.className="askov"; o.style.zIndex="400"; o.setAttribute("role","dialog"); o.setAttribute("aria-modal","true"); o.setAttribute("aria-label","Add Sub Planner to your home screen");
+    o.innerHTML=`<div class="askbox" style="text-align:center;max-width:420px"><div style="font-size:46px;line-height:1">📲</div><h2 style="margin:8px 0 6px">Put Sub Planner on your ${ios||android?"home screen":"computer"}</h2><p style="margin:0 0 12px">It works much better as an app:</p><ul style="text-align:left;margin:0 0 16px;padding-left:22px;display:grid;gap:6px"><li>Opens in one tap, like any app</li><li>Works with no internet</li><li>Keeps your plans safer${ios?" (Safari can clear website data)":""}</li></ul><button class="btn primary big" data-n="go" style="width:100%;justify-content:center">📲 Add it now</button><div class="row" style="justify-content:space-between;margin-top:10px;flex-direction:row"><button class="linkbtn" data-n="later">Not now</button><button class="linkbtn muted" data-n="never">Don't ask again</button></div></div>`;
+    document.body.append(o); const close=()=>o.remove(); setTimeout(()=>o.querySelector('[data-n="go"]').focus(),50);
+    o.querySelector('[data-n="go"]').onclick=()=>{ close(); LW("sdp-inst-snooze",Date.now()+86400000); window.__installApp(); };
+    o.querySelector('[data-n="later"]').onclick=()=>{ close(); LW("sdp-inst-snooze",Date.now()+86400000); toast("You can add it any time with 📲 at the top."); };
+    o.querySelector('[data-n="never"]').onclick=()=>{ close(); LW("sdp-inst-never","1"); toast("OK. The 📲 button at the top still works."); };
+    o.addEventListener("keydown",e=>{ if(e.key==="Escape"){ close(); LW("sdp-inst-snooze",Date.now()+86400000); } }); };
+  addEventListener("appinstalled",()=>{ const n=document.getElementById("inst-nag"); if(n) n.remove(); LW("sdp-inst-never","1"); });
+  setTimeout(nag,1200);
 })();
 async function offerFile(filename,data,type){
   if(STANDALONE){ const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([data],{type})); a.download=filename; document.body.append(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},1000); toast("Downloaded "+filename); return; }
